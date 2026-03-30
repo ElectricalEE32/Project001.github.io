@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="th">
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>คลังข้อสอบ EE32 - รวมข้อสอบวิศวกรรมไฟฟ้า (Electrical Engineering)</title>
+    <meta name="description" content="คลังข้อสอบ EE32 รวบรวมข้อสอบวิศวกรรมไฟฟ้า (Electrical Engineering) สำหรับทบทวนก่อนสอบ มีทั้งหมวด GE, LAB และข้อสอบ Machine พร้อมระบบสุ่มทำข้อสอบและจับเวลา">
+    <meta name="keywords" content="คลังข้อสอบ EE32, คลังข้อสอบ EE, ข้อสอบวิศวกรรมไฟฟ้า, ข้อสอบ Electrical Machines, EE32, ติวสอบ EE, สอบกว. ไฟฟ้า">
+    <meta name="author" content="EE32">
+	<meta name="google-site-verification" content="Yq5ymNjOa2jX1t2V3UP9IFSaXsp896IrZogsagXEjwE" />
+    <link href="https://fonts.googleapis.com/css2?family=Niramit:wght@300;400;500;600&display=swap" rel="stylesheet"> 
+    <style>
+        :root {
+            --primary: #0f4c81; 
+            --secondary: #f39c12; 
+            --bg-color: #f4f7f6;
+            --text-main: #333;
+            --text-muted: #666;
+        }
+
+        body { font-family: 'Niramit', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-main); }
+        header { background-color: var(--primary); color: white; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
+        
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 250px 1fr; gap: 2rem; }
+        
+        /* สไตล์ของ Sidebar */
+        .sidebar { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); height: fit-content; }
+        .sidebar h3 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--secondary); padding-bottom: 0.5rem; }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar li { padding: 0.8rem 0; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
+        .sidebar li:hover, .sidebar li.active { color: var(--secondary); padding-left: 5px; font-weight: 600; }
+
+        /* ---------- ส่วนที่เพิ่มใหม่: CSS สำหรับจัดการเมนูย่อย ---------- */
+        .menu-group {
+            padding: 0 !important;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-title {
+            padding: 0.8rem 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .menu-title:hover {
+            color: var(--secondary);
+            padding-left: 5px;
+        }
+        .submenu {
+            display: none; 
+            list-style: none;
+            padding: 0 0 0 1.5rem !important; 
+            margin: 0;
+            background-color: #fdfdfd;
+        }
+        .submenu.show {
+            display: block; 
+        }
+        .submenu li {
+            font-size: 0.95rem;
+            border-bottom: none !important;
+        }
+        .arrow {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease; 
+        }
+        /* ----------------------------------------------------------- */
+
+        .main-content { display: flex; flex-direction: column; gap: 1.5rem; }
+        
+        .search-section { display: flex; gap: 1rem; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .search-section input { flex: 1; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 1rem; }
+        
+        .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .exam-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); transition: 0.2s; display: flex; flex-direction: column; }
+        .exam-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-top: 4px solid var(--secondary); }
+        .exam-card h4 { margin: 0 0 0.5rem 0; font-size: 1.2rem; color: var(--primary); word-break: break-all; } /* ป้องกันชื่อไฟล์ยาวทะลุการ์ด */
+        .exam-card p { margin: 0.2rem 0; color: var(--text-muted); font-size: 0.9rem; }
+        
+        .tags { margin-top: 1rem; margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tag { background: #eee; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; color: #555; }
+        
+        .btn-download { margin-top: auto; text-align: center; background-color: var(--primary); color: white; padding: 0.6rem; text-decoration: none; border-radius: 4px; font-weight: 500; transition: background 0.2s; }
+        .btn-download:hover { background-color: #0b3960; }
+        .btn-quiz { background-color: #e67e22; border-top-color: #e67e22;}
+        .btn-quiz:hover { background-color: #d35400; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚡ คลังข้อสอบ EE BY #EE32</h1>
+        <div style="font-size: 0.9rem;">Electrical Engineering Exam Bank</div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3>หมวดหมู่วิชา</h3>
+            <ul>
+                <li onclick="filterExams('all')" class="active" id="menu-all" style="padding: 0.8rem 0; border-bottom: 1px solid #eee; cursor: pointer;">📚 ดูทั้งหมด</li>
+                
+                <li class="menu-group">
+                    <div class="menu-title" onclick="toggleSubmenu('sub-ee', this)">
+                        ⚡ หมวดวิชาเอก (EE) <span class="arrow">▼</span>
+                    </div>
+                    <ul class="submenu" id="sub-ee">
+                        <li onclick="filterExams('machine')" id="menu-machine">⚙️ Machine</li>
+                    </ul>
+                </li>
+
+                <li class="menu-group">
+                    <div class="menu-title" onclick="toggleSubmenu('sub-ge', this)">
+                        🌐 หมวดวิชาทั่วไป (GE) <span class="arrow">▼</span>
+                    </div>
+                    <ul class="submenu" id="sub-ge">
+                        <li onclick="filterExams('law')" id="menu-law">⚖️ Law in Daily</li>
+                        <li onclick="filterExams('life')" id="menu-life">🌱 Life Skill</li>
+                        <li onclick="filterExams('Art')" id="menu-Art">🎨 Art App</li>
+                    </ul>
+                </li>
+		<li class="menu-group">
+                    <div class="menu-title" onclick="toggleSubmenu('sub-lab', this)">
+                        👩🏼‍🔬 หมวดวิชาแลป (LAB) <span class="arrow">▼</span>
+                    </div>
+                    <ul class="submenu" id="sub-lab">
+			<li onclick="filterExams('Elect')" id="menu-Elect"> 👩🏼‍🔬Lab Electronics</li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="search-section">
+                <input type="text" id="searchInput" placeholder="พิมพ์ชื่อวิชา เพื่อค้นหา..." onkeyup="searchExams()">
+            </div>
+
+            <div class="exam-grid" id="examGrid">
+                
+                <div class="exam-card" data-category="machine">
+                    <h4>Electrical Machines (แบบทดสอบ กว.)</h4>
+                    <p>รหัสวิชา: </p>
+                    <p>อ.ผู้สอน: บักไหม</p>
+                    <div class="tags">
+                        <span class="tag">อัปเดตใหม่</span>
+                        <span class="tag">Online Quiz</span>
+                        <span class="tag">220 ข้อ</span>
+                    </div>
+                    <a href="machine-quiz.html" class="btn-download btn-quiz">📝 เข้าทำแบบทดสอบ</a>
+                </div>
+
+                <div class="exam-card" data-category="machine">
+                    <h4> machine กว. (PDF) </h4>
+                    <p>รหัสวิชา: </p>
+                    <p>อ.ผู้สอน: </p>
+                    <div class="tags">
+                        <span class="tag">ปี 2567</span>
+                        <span class="tag">Midterm</span>
+                        <span class="tag">มีเฉลย</span>
+                    </div>
+                    <a href="KW.pdf" class="btn-download">ดูเนื้อหา</a>
+                </div>
+
+                <div class="exam-card" data-category="law">
+                    <h4> LAW </h4>
+                    <p>รหัสวิชา: </p>
+                    <p>อ.ผู้สอน: </p>
+                    <div class="tags">
+                        <span class="tag">ปี 2567</span>
+                        <span class="tag">Midterm</span>
+                        <span class="tag">มีเฉลย</span>
+                    </div>
+                    <a href="Law.html" class="btn-download btn-quiz">📝 เข้าทำแบบทดสอบ</a>
+                </div>
+
+                <div class="exam-card" data-category="life">
+                    <h4> Life Skill </h4>
+                    <p>รหัสวิชา: </p>
+                    <p>อ.ผู้สอน: </p>
+                    <div class="tags">
+                        <span class="tag">ปี 2567</span>
+                        <span class="tag">Midterm</span>
+                        <span class="tag">มีเฉลย</span>
+                    </div>
+                    <a href="lifeskill.html" class="btn-download btn-quiz">📝 เข้าทำแบบทดสอบ</a>
+                </div>
+
+                <div class="exam-card" data-category="Art">
+                    <h4> Midterm Art </h4>
+                    <p>รหัสวิชา: </p>
+                    <p>อ.ผู้สอน: </p>
+                    <div class="tags">
+                        <span class="tag">ปี 2567</span>
+                        <span class="tag">Midterm</span>
+                        <span class="tag">มีเฉลย</span>
+                    </div>
+                    <a href="midterm art_app.pdf" class="btn-download ">ดูเนื้อหา</a>
+                </div>
+
+                <div class="exam-card" data-category="Art">
+                    <h4> Summary Art </h4>
+                    <p>รหัสวิชา: </p>
+                    <p>อ.ผู้สอน: </p>
+                    <div class="tags">
+                        <span class="tag">ปี 2567</span>
+                        <span class="tag">Midterm</span>
+                        <span class="tag">มีเฉลย</span>
+                    </div>
+                    <a href="Summary Art.pdf" class="btn-download ">ดูเนื้อหา</a>
+                </div>
+                </div>
+        </main>
+    </div>
+
+    <script>
+        // ========================================================
+        // 1. ระบบดึงไฟล์อัตโนมัติจาก GitHub
+        // ========================================================
+        const githubUser = "oiiiuyr6465321-ctrl"; 
+        const githubRepo = "Project001.github.io"; 
+        const folderName = "files"; // ตั้งให้ตรงกับชื่อโฟลเดอร์ใน GitHub
+        
+        const apiUrl = `https://api.github.com/repos/${githubUser}/${githubRepo}/contents/${folderName}`;
+
+        async function fetchExamsFromGitHub() {
+            const grid = document.getElementById('examGrid');
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("ไม่พบข้อมูล");
+                const files = await response.json();
+
+                files.forEach(file => {
+                    if (file.name.endsWith('.pdf') || file.name.endsWith('.html')) {
+                        
+                        let isQuiz = file.name.endsWith('.html');
+                        let btnClass = isQuiz ? "btn-download btn-quiz" : "btn-download";
+                        let btnText = isQuiz ? "📝 เข้าทำแบบทดสอบ" : "📥 ดูเนื้อหา";
+
+                        // สร้างลิงก์เว็บไซต์ (GitHub Pages)
+                        let webUrl = `https://${githubUser}.github.io/${githubRepo}/${folderName}/${file.name}`;
+
+                        // ======================================================
+                        // 1. ระบบแยกหมวดหมู่อัตโนมัติจาก "ชื่อไฟล์"
+                        // ======================================================
+                        let fileNameLower = file.name.toLowerCase(); 
+                        let fileCategory = "all"; 
+
+                        if (fileNameLower.includes("machine")) {
+                            fileCategory = "machine";
+                        } else if (fileNameLower.includes("law")) {
+                            fileCategory = "law";
+                        } else if (fileNameLower.includes("life")) {
+                            fileCategory = "life";
+                        } else if (fileNameLower.includes("art")) {
+                            fileCategory = "Art";
+			} else if (fileNameLower.includes("elect")) {
+                            fileCategory = "Elect";
+                        }
+
+                        // ======================================================
+                        // 2. ระบบตัดนามสกุลไฟล์ (.html, .pdf) ออกก่อนเอาไปโชว์
+                        // ======================================================
+                        // ใช้คำสั่งแทนที่ .html และ .pdf ให้เป็นค่าว่าง (ลบทิ้ง)
+                        let displayName = file.name.replace('.html', '').replace('.pdf', '');
+
+                        const cardHtml = `
+                            <div class="exam-card" data-category="${fileCategory}">
+                                <h4>${displayName}</h4>
+                                <p>รหัสวิชา: บ่รู้</p>
+                                <p>อ.ผู้สอน: บ่รู้</p>
+				<p> ระบบ: Auto </p>
+                                <div class="tags">
+                                    <span class="tag">เพิ่งอัปโหลด</span>
+                                    <span class="tag">จาก GitHub</span>
+                                </div>
+                                <a href="${webUrl}" target="_blank" class="${btnClass}">${btnText}</a>
+                            </div>
+                        `;
+                        
+                        grid.innerHTML += cardHtml;
+                    }
+                });
+            } catch (error) {
+                console.log("ยังไม่มีไฟล์ใน GitHub หรือตั้งค่าผิด:", error);
+            }
+        }
+
+        // ========================================================
+        // 2. ระบบฟังก์ชันเดิมของคุณ (Menu, Search, Sidebar)
+        // ========================================================
+        function filterExams(category) {
+            document.querySelectorAll('.submenu li, #menu-all').forEach(li => li.classList.remove('active'));
+            
+            if(category === 'all') {
+                document.getElementById('menu-all').classList.add('active');
+            } else {
+                document.getElementById('menu-' + category).classList.add('active');
+            }
+
+            const cards = document.querySelectorAll('.exam-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            document.getElementById('searchInput').value = ''; 
+        }
+
+        function searchExams() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.exam-card');
+            
+            document.querySelectorAll('.submenu li, #menu-all').forEach(li => li.classList.remove('active'));
+            document.getElementById('menu-all').classList.add('active');
+
+            cards.forEach(card => {
+                const title = card.querySelector('h4').innerText.toLowerCase();
+                const code = card.querySelector('p').innerText.toLowerCase();
+                
+                if (title.includes(input) || code.includes(input)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleSubmenu(menuId, element) {
+            const submenu = document.getElementById(menuId);
+            submenu.classList.toggle('show');
+            
+            const arrow = element.querySelector('.arrow');
+            if (submenu.classList.contains('show')) {
+                arrow.style.transform = 'rotate(180deg)'; 
+            } else {
+                arrow.style.transform = 'rotate(0deg)'; 
+            }
+        }
+
+        // 3. สั่งให้ดึงไฟล์จาก GitHub ทันทีเมื่อเปิดเว็บ
+        fetchExamsFromGitHub();
+    </script>
+<div style="position: fixed; bottom: 20px; right: 20px; background: white; padding: 8px 15px; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; z-index: 9999; border: 1px solid #eee;">
+        <span style="color: #2ecc71; animation: blink 1.5s infinite; font-size: 12px;">🟢</span>
+        <span style="font-size: 0.9rem; font-weight: 500; color: #333;">ออนไลน์:</span>
+        
+        <script id="_wau80h">var _wau = _wau || []; _wau.push(["dynamic", "w5bebl3be7", "80h", "ffffff0f4c81", "small"]);</script><script async src="//waust.at/d.js"></script>
+        
+        <style>
+            @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        </style>
+    </div>
+</body>
+</html>
