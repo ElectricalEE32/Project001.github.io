@@ -130,6 +130,15 @@
                         <li onclick="filterExams('Art')" id="menu-Art">🎨 Art App</li>
                     </ul>
                 </li>
+				 <li class="menu-group">
+                    <div class="menu-title" onclick="toggleSubmenu('sub-ge', this)">
+                        🌐 English <span class="arrow">▼</span>
+                    </div>
+                    <ul class="submenu" id="sub-English">
+                        <li onclick="filterExams('English 4')" id="menu-Eng4">🪅 English 4</li>
+                        <li onclick="filterExams('English 5')" id="menu-Eng5">🪅 English 5</li>
+                    </ul>
+                </li>
 		<li class="menu-group">
                     <div class="menu-title" onclick="toggleSubmenu('sub-lab', this)">
                         👩🏼‍🔬 หมวดวิชาแลป (LAB) <span class="arrow">▼</span>
@@ -317,6 +326,10 @@
                             fileCategory = "Art";
 			} else if (fileNameLower.includes("elect")) {
                             fileCategory = "Elect";
+							} else if (fileNameLower.includes("english4")) {
+                            fileCategory = "English4";
+							} else if (fileNameLower.includes("english5")) {
+                            fileCategory = "English5";
                         }
 
                         // ======================================================
