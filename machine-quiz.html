@@ -1148,16 +1148,24 @@
             randomEasyBtn1.className = 'chapter-btn';
             randomEasyBtn1.style.backgroundColor = '#27ae60';
             randomEasyBtn1.style.marginBottom = '10px';
-            randomEasyBtn1.innerText = '🟢 สุ่ม 40 ข้อ (ระดับง่าย - ตัวเลือกปกติ)';
-            randomEasyBtn1.onclick = () => startRandomQuiz(false, 1, 220); // false=ง่าย, เริ่มข้อ 1, จบข้อ 220
+            randomEasyBtn1.innerText = '🟢 สุ่ม 50 ข้อ (ระดับง่าย - ตัวเลือกปกติ)';
+            randomEasyBtn1.onclick = () => startRandomQuiz(false, 1, 220, 50); // false=ง่าย, เริ่มข้อ 1, จบข้อ 220
             listDiv.appendChild(randomEasyBtn1);
+
+	    const randomaBtn1 = document.createElement('button');
+            randomaBtn1.className = 'chapter-btn';
+            randomaBtn1.style.backgroundColor = '#27ae60';
+            randomaBtn1.style.marginBottom = '10px';
+            randomaBtn1.innerText = '🟢 สุ่ม 220 ข้อ (ระดับง่าย - ตัวเลือกปกติ)';
+            randomaBtn1.onclick = () => startRandomQuiz(false, 1, 220, 220, false); // false=ง่าย, เริ่มข้อ 1, จบข้อ 220
+            listDiv.appendChild(randomaBtn1);
 
             const randomHardBtn1 = document.createElement('button');
             randomHardBtn1.className = 'chapter-btn';
             randomHardBtn1.style.backgroundColor = '#e74c3c';
             randomHardBtn1.style.marginBottom = '25px'; // เว้นระยะห่างกลุ่ม
-            randomHardBtn1.innerText = '🔴 สุ่ม 40 ข้อ (ระดับยาก - สลับตัวเลือก)';
-            randomHardBtn1.onclick = () => startRandomQuiz(true, 1, 220); // true=ยากสลับช้อย, เริ่ม 1, จบ 220
+            randomHardBtn1.innerText = '🔴 สุ่ม 50 ข้อ (ระดับยาก - สลับตัวเลือก)';
+            randomHardBtn1.onclick = () => startRandomQuiz(true, 1, 220, 50); // true=ยากสลับช้อย, เริ่ม 1, จบ 220
             listDiv.appendChild(randomHardBtn1);
 
             // --- กลุ่มที่ 2: สุ่มข้อ 221 - 388 (เนื้อหาครึ่งหลัง) ---
@@ -1169,16 +1177,16 @@
             randomEasyBtn2.className = 'chapter-btn';
             randomEasyBtn2.style.backgroundColor = '#27ae60';
             randomEasyBtn2.style.marginBottom = '10px';
-            randomEasyBtn2.innerText = '🟢 สุ่ม 40 ข้อ (ระดับง่าย - ตัวเลือกปกติ)';
-            randomEasyBtn2.onclick = () => startRandomQuiz(false, 221, 388); // เริ่ม 221, จบ 388
+            randomEasyBtn2.innerText = '🟢 สุ่ม 50 ข้อ (ระดับง่าย - ตัวเลือกปกติ)';
+            randomEasyBtn2.onclick = () => startRandomQuiz(false, 221, 388, 50); // เริ่ม 221, จบ 388
             listDiv.appendChild(randomEasyBtn2);
 
             const randomHardBtn2 = document.createElement('button');
             randomHardBtn2.className = 'chapter-btn';
             randomHardBtn2.style.backgroundColor = '#e74c3c';
             randomHardBtn2.style.marginBottom = '25px'; // เว้นระยะห่างกลุ่ม
-            randomHardBtn2.innerText = '🔴 สุ่ม 40 ข้อ (ระดับยาก - สลับตัวเลือก)';
-            randomHardBtn2.onclick = () => startRandomQuiz(true, 221, 388); // เริ่ม 221, จบ 388
+            randomHardBtn2.innerText = '🔴 สุ่ม 50 ข้อ (ระดับยาก - สลับตัวเลือก)';
+            randomHardBtn2.onclick = () => startRandomQuiz(true, 221, 388, 50); // เริ่ม 221, จบ 388
             listDiv.appendChild(randomHardBtn2);
             
             // --- กลุ่มที่ 3: ทำข้อสอบรายบท ---
@@ -1197,14 +1205,15 @@
         }
 
         // 2. ฟังก์ชันเริ่มโหมดสุ่ม (เพิ่มการรับค่าเลขข้อเริ่มต้น และเลขข้อสุดท้าย)
-        function startRandomQuiz(isHardMode, startNo, endNo) {
+        function startRandomQuiz(isHardMode, startNo, endNo, amount, isRandom = true) {
             document.getElementById('chapter-selection').style.display = 'none';
             document.getElementById('quiz-container').style.display = 'block';
             
             // อัปเดตหัวข้อให้โชว์ด้วยว่ากำลังสุ่มช่วงข้อที่เท่าไหร่
+		const modeText = isRandom ? "สุ่มข้อ" : "เรียงตามข้อ";
             document.getElementById('chapter-title').innerText = isHardMode ? 
-                `🔴 โหมดสุ่มทำข้อสอบ 40 ข้อ (ข้อ ${startNo} - ${endNo} | ระดับยาก - สลับตัวเลือก)` : 
-                `🟢 โหมดสุ่มทำข้อสอบ 40 ข้อ (ข้อ ${startNo} - ${endNo} | ระดับง่าย - ปกติ)`;
+                `🔴 โหมดสุ่มทำข้อสอบ 50 ข้อ (ข้อ ${startNo} - ${endNo} | ระดับยาก - สลับตัวเลือก)` : 
+                `🟢 โหมดสุ่มทำข้อสอบ 50 ข้อ (ข้อ ${startNo} - ${endNo} | ระดับง่าย - ปกติ)`;
             
             const questionsArea = document.getElementById('questions-area');
             questionsArea.innerHTML = '';
@@ -1216,9 +1225,13 @@
 
             // กรองเอาเฉพาะข้อที่อยู่ในช่วงที่เรากำหนด (startNo ถึง endNo)
             allQuestions = allQuestions.filter(q => q.no >= startNo && q.no <= endNo);
+
+	    if (isRandom) {
+        	allQuestions.sort(() => 0.5 - Math.random());
+    }
             
-            allQuestions.sort(() => 0.5 - Math.random());
-            const selectedQuestions = allQuestions.slice(0, 40);
+            
+            const selectedQuestions = allQuestions.slice(0, amount);
 
             // ส่งไปให้ระบบวาดข้อสอบและจับคะแนน
             renderQuestions(selectedQuestions, questionsArea, isHardMode);
