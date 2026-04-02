@@ -67,6 +67,7 @@
                 <option value="chapter5">บทที่ 5: สัญญาจ้างแรงงานและจ้างทำของ</option>
                 <option value="chapter6">บทที่ 6: สัญญาซื้อขาย</option>
                 <option value="all" style="font-weight:bold; color:#e74c3c;">🔥 สุ่มรวมทุกบท (ท้าทาย - 30 ข้อ) 🔥</option>
+		<option value="allexam" style="font-weight:bold; color:#e74c3c;">🔥 รวมทุกบท (ท้าทาย) 🔥</option>
                 <option value="old_exams" style="font-weight:bold; color:#f39c12;">⭐ แนวข้อสอบ Midterm 1 (รวมข้อสอบเก่า)</option>
                 <option value="midterm2" style="font-weight:bold; color:#8e44ad;">📝 แนวข้อสอบ Midterm 2 (35 ข้อ)</option>
             </select>
@@ -222,6 +223,18 @@
             ];
             questions = questions.sort(() => Math.random() - 0.5);
             questions = questions.slice(0, 30);
+
+	} else if (chapter === 'allexam') {
+            questions = [
+                ...quizData.chapter1, 
+                ...quizData.chapter2, 
+                ...quizData.chapter3, 
+                ...quizData.chapter4,
+                ...quizData.chapter5,
+                ...quizData.chapter6
+            ];
+            questions = questions.sort(() => Math.random() - 0.5);
+            
             
         } else if (chapter === 'old_exams') {
             let allQuestions = [
