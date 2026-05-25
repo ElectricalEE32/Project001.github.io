@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Skill Quiz App (รวม 3 ชุด)</title>
+    <style>
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: #fff;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin: 20px 0;
+        }
+        /* ส่วนแท็บด้านบน */
+        .tab-container {
+            display: flex;
+            background-color: #333;
+            border-bottom: 3px solid #4CAF50;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px 5px;
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover {
+            background-color: #444;
+            color: #fff;
+        }
+        .tab-btn.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .header {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 15px;
+            background-color: #eee;
+            gap: 8px;
+            align-items: center;
+        }
+        .nav-btn {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            width: 35px;
+            height: 35px;
+        }
+        .nav-btn:hover {
+            background-color: #ddd;
+        }
+        .nav-btn.active {
+            border: 3px solid #333;
+            font-weight: bold;
+            transform: scale(1.1);
+        }
+        .nav-btn.correct-nav {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        .nav-btn.incorrect-nav {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        /* ปุ่มอ้างอิง */
+        .ref-btn {
+            width: auto;
+            padding: 5px 15px;
+            background-color: #ff9800;
+            color: white;
+            border-color: #f57c00;
+            font-weight: bold;
+        }
+        .ref-btn:hover {
+            background-color: #e68a00;
+        }
+        .ref-btn.active {
+            border: 3px solid #333;
+            transform: scale(1.1);
+        }
+        
+        .content {
+            padding: 30px;
+            flex-grow: 1;
+        }
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option {
+            background-color: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover:not(.disabled) {
+            border-color: #4CAF50;
+            background-color: #f1fff1;
+        }
+        .option input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+            font-weight: bold;
+        }
+
+        .footer {
+            padding: 20px 30px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-prev { background-color: #9e9e9e; color: white; }
+        .btn-prev:hover { background-color: #757575; }
+        .btn-next { background-color: #4CAF50; color: white; }
+        .btn-next:hover { background-color: #45a049; }
+        .btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        .result-container {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+        #score-text {
+            font-size: 36px;
+            color: #4CAF50;
+            margin: 20px 0;
+        }
+
+        /* สไตล์ของหน้าอ้างอิง */
+        .reference-box {
+            background-color: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            border-radius: 5px;
+            line-height: 1.6;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        .ref-keyword {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-app">
+    <div class="tab-container">
+        <button class="tab-btn active" id="tab1-btn" onclick="switchTab(1)">Quiz ในห้อง(ขาดควิซสุดท้ายใครมีทักมา)</button>
+        <button class="tab-btn" id="tab2-btn" onclick="switchTab(2)">ข้อสอบปีเก่า01(ถ้าอิงตามเนื้อหาปีเรามันเริ่มที่ข้อ15นะ)</button>
+        <button class="tab-btn" id="tab3-btn" onclick="switchTab(3)">Enneagram (9 ลักษณ์)</button>
+    </div>
+
+    <div class="header">
+        <strong id="quiz-title">กำลังทำชุดทดสอบ: Quiz ในห้อง</strong> <br>
+        <span style="font-size: 12px; color: #666;">(https://drive.google.com/file/d/1bbNFxcHOO0NGE0xwQ7K-A0GZ6G166t0n/view?usp=drivesdk อันนี้ควิซนะคัดลอกลิ้งก์ไปวางได้เลย)</span>
+    </div>
+    
+    <div class="nav-bar" id="nav-bar"></div>
+
+    <div class="content" id="quiz-content">
+        <div class="question" id="question-text">คำถามจะปรากฏที่นี่</div>
+        <div class="options" id="options-container"></div>
+    </div>
+
+    <div class="content" id="reference-content" style="display: none;">
+        <h3 style="margin-top: 0; color: #e65100;">📖 สรุปเนื้อหา 9 ลักษณ์ (Enneagram) เพิ่มเติมลักษณ์ที่ 6 มีอีกชื่อคือนักปุจฉาคาดการณ์เหตุร้ายนะ เผื่อมันออกไปเจอมา</h3>
+        <div class="reference-box">
+            <p><strong>1. แรงจูงใจของคนลักษณ์ 1 ( Perfectionist ผู้ชอบความสมบูรณ์แบบ )</strong><br>คือ ต้องการ<span class="ref-keyword">ดำเนินชีวิตในแบบที่ถูกต้อง</span> ต้องการปรับปรุงตนเองและสิ่งต่างๆ</p>
+            <p><strong>2. แรงจูงใจของคนลักษณ์ 2 ( Adviser ผู้ให้ ผู้ช่วยเหลือ )</strong><br>คือ ต้องการ<span class="ref-keyword">เป็นที่รัก</span> มีคนเห็นคุณค่า และแสดงความรู้สึกดีๆ ต่อผู้อื่น</p>
+            <p><strong>3. แรงจูงใจของคนลักษณ์ 3 ( Achiever ผู้ใฝ่ความสำเร็จ )</strong><br>คือ ต้องการสร้างผลงาน ความสำเร็จและ<span class="ref-keyword">หลีกเลี่ยงความล้มเหลว</span></p>
+            <p><strong>4. แรงจูงใจของคนลักษณ์ 4 ( Individualist ศิลปิน )</strong><br>คือ ต้องการสัมผัสความรู้สึกของตัวเอง ต้องการให้ผู้อื่นเข้าใจ <span class="ref-keyword">ค้นหาความหมายของชีวิตและหลีกเลี่ยงความสามัญธรรมดา</span></p>
+            <p><strong>5. แรงจูงใจของคนลักษณ์ 5 ( Thinker นักคิด นักสังเกต )</strong><br>คือ ต้องการที่จะ<span class="ref-keyword">รู้และเข้าใจสิ่งต่างๆ</span> มีความเพียงพอในตัวเอง และไม่ทำตัวให้ดูเหมือนโง่</p>
+            <p><strong>6. แรงจูงใจของคนลักษณ์ 6 ( Guardian นักจงรักภักดี ผู้ปกครอง ผู้พิทักษ์ )</strong><br>คือ ต้องการ<span class="ref-keyword">ความมั่นคง</span> (ลักษณ์ 6 แบบกลัวแล้วถอย จะไม่มีทางที่กลัวและมองหาการยอมรับ ส่วนลักษณ์ 6 แบบสู้ความกลัว จะเดินเข้าชนสิ่งที่ทำให้กลัว ทั้งสองแบบนี้อาจปรากฏอยู่ในตัวคนเดียวกันได้)</p>
+            <p><strong>7. แรงจูงใจของคนลักษณ์ 7 ( Optimist นักผจญภัย รักสนุก )</strong><br>คือ ต้องการ<span class="ref-keyword">หาความสุข</span> คิดแผนทำกิจกรรม<span class="ref-keyword">สนุกๆ</span> สร้างสิ่งดีๆ ให้กับโลกและหลีกเลี่ยงเรื่องเจ็บปวดและทุกข์ใจ</p>
+            <p><strong>8. แรงจูงใจของคนลักษณ์ 8 ( Challenger ผู้นำ ชอบความท้าทาย )</strong><br>คือ การ<span class="ref-keyword">พึ่งตัวเอง</span> แสดงความ<span class="ref-keyword">เข้มแข็ง</span> และหลีกเลี่ยงความรู้สึกอ่อนแอหรือต้องขึ้นอยู่กับผู้อื่น</p>
+            <p><strong>9. แรงจูงใจของคนลักษณ์ 9 ( Mediator ผู้รักสงบ ผู้ไกล่เกลี่ย คนกลาง)</strong><br>คือ <span class="ref-keyword">รักษาความปรองดอง</span> กลมกลืนกับผู้อื่น และหลีกเลี่ยงความขัดแย้ง (มักรับเอาลักษณะของทั้ง 8 ลักษณ์มาไว้ในตัว บางคนอาจดูสุภาพอ่อนโยน บางคนอาจรักอิสระและดูมีอำนาจ)</p>
+            <hr>
+            <p><em>***หมายเหตุ: ตัวหนังสือสีแดง ในบทนี้คือ keyword ที่ผู้สรุปจำเข้าไปสอบในห้องสอบ จริงๆ จะจำ keyword อื่นก็ได้ที่แต่ละคนเข้าใจเพราะแนวข้อสอบบทนี้ออกข้อสอบแบบตรงๆ</em></p>
+        </div>
+    </div>
+
+    <div class="result-container" id="result-content">
+        <h2>สรุปผลคะแนนของคุณ</h2>
+        <h1 id="score-text">0 / 0</h1>
+        <button class="btn btn-next" onclick="resetCurrentQuiz()" style="margin-top: 20px;">ทำชุดนี้ใหม่อีกครั้ง</button>
+    </div>
+
+    <div class="footer" id="footer-controls">
+        <button class="btn btn-prev" id="btn-prev" onclick="prevQuestion()">ก่อนหน้า</button>
+        <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">ถัดไป</button>
+    </div>
+</div>
+
+<script>
+    // ================== DATA ชุดที่ 1 (ถูกต้อง 100% ตามรูป) ==================
+    const quizData1 = [
+        { question: "1. เราสามารถเปลี่ยนกรอบความคิดตัวเองได้หรือไม่", options: ["ไม่ได้ เพราะมนุษย์ทุกคนมีข้อจำกัด", "ได้ ต้องอาศัยความตั้งใจและความพยายาม", "ได้ ต้องอาศัยความฉลาดที่เรามีมาแต่ดั้งเดิม", "ไม่ได้ เพราะกรอบความคิดคือตัวมาแต่กำเนิด", "ได้ หรือไม่ได้ ขึ้นกับสังคมและวัฒนธรรมเป็นผู้กำหนด"], answer: 1 },
+        { question: "2. การปลูกฝังทักษะชีวิต (Life skill) ให้กับเด็กเรื่องกรอบความคิดแบบเติบโต (positive growth mindset) มีทุกข้อต่อไปนี้ยกเว้น", options: ["ศักยภาพของสมอง (Brainology)", "การตั้งเป้าหมาย (Expectation)", "ไม่พลาดเมื่อผิดพลาด (Mistake is interesting)", "แค่เขายังทำมันไม่เสร็จ (Power of YET)", "ชมที่กระบวนการและผลลัพธ์ (Praising process and outcome)"], answer: 4 },
+        { question: "3. หลักการข้อมูลป้อนกลับ (Feedback) ต่องานและพฤติกรรมของบุคคลทำ การ feedback ที่มีประสิทธิภาพจะช่วยเพิ่มผลสัมฤทธิ์ในการเรียนการทำงาน โดยอาศัยหลักการต่อไปนี้ ยกเว้น", options: ["STOP เทคนิค", "Objective เป็นรูปธรรม ข้อมูลเทียบกับผู้อื่น", "Specific เจาะจง สิ่งที่ดี/ไม่ดี อะไรที่พัฒนาต่อได้", "Timely ทันที ควร feedback ทันที เพื่อการปรับปรุงที่รวดเร็ว", "Plan วางแผนร่วมกัน เพื่อพัฒนาโดยเลือกว่าจะพัฒนาจุดใดก่อน"], answer: 1 },
+        { question: "4. การชมเด็กๆว่าฉลาดกลับทำให้พวกเขารู้สึกโง่และทำสิ่งที่โง่ลงเรื่อยๆ เป็นคำพูดที่บอกถึงกรอบความคิดแบบยึดติด ถ้ามองตามแนวคิด positive growth mindset เหตุใดจึงเกิดเหตุการณ์เช่นนั้น", options: ["คำชื่นชมเหล่านี้เป็นสิ่งที่ไม่ได้พูดถึงความพยายาม", "คำชื่นชมเหล่านี้ ทำให้เด็กมีการเรียนรู้เพิ่มขึ้นเล็กน้อย", "คำชื่นชมเด็กเช่นนี้ทำให้เด็กไม่หลีกเลี่ยงความผิดพลาด", "คำชื่นชมเหล่านี้มีความสำคัญเช่นกันในผู้ใหญ่มากกว่าเด็ก", "คำชื่นชมว่าเด็กฉลาดเป็นการตัดสินใจจากการวัดผลอนาคต"], answer: 0 },
+        { question: "5. เมื่อเด็กถูกจัดอยู่ในกลุ่มที่ไม่เก่ง ท่านคิดว่าจะทำให้เด็กมีกรอบความคิดแบบยึดติด (Fixed mindset) หรือแบบเติบโต (Growth mindset) เพราะเหตุใด", options: ["Growth mindset เพราะเด็กจะได้เรียนรู้มากขึ้น", "Growth mindset เพราะเด็กถูกคัดเลือกจากคะแนนสอบเข้า", "Fixed mindset เพราะเด็กกลุ่มไม่เก่ง คือคนที่เรียนรู้ได้น้อย", "Fixed mindset เพราะเด็กถูกตัดสินทำให้มีความเชื่อว่าไม่เก่ง", "Fixed และ growth mindset ขึ้นกับมุมมองของตนเองและผู้อื่น"], answer: 3 },
+        { question: "6. ข้อใดเป็นเท็จเกี่ยวกับเหนือธรรมชาตินิยม", options: ["มนุษย์ควบคุมกฎเกณฑ์ธรรมชาติได้ทั้งหมด", "ชีวิตหลังความตายตามคำสอนศาสนาเป็นสิ่งที่เกินไปจากกฎธรรมชาติจะไม่มีคำอธิบายตายตัว", "เหนือธรรมชาตินิยมยอมรับว่า ความรู้และปัญญาของมนุษย์มีข้อจำกัดในการเข้าใจความจริงของโลก แท้จริงแล้วมีความเป็นจริงที่ยิ่งใหญ่กว่าชีวิตมนุษย์", "ความหมายชีวิตของมนุษย์ถูกกำหนดด้วยความจริงสูงสุดตามคำสอนของแต่ละศาสนา", "ศาสนาไม่ใช่การนับถือสิ่งศักดิ์สิทธิ์เพราะศาสนามีระบบคำสอนที่มากกว่าการดลบันดาลให้สมหวัง"], answer: 0 },
+        { question: "7. ข้อใดเกี่ยวกับปรัชญาเรื่องความหมายชีวิต", options: ["ชีวิตคือการต่อสู้", "ชีวิตคือละครที่ทุกคนเป็นตัวเอก", "ความหมายที่แท้จริงชีวิตมนุษย์คือการกินอิ่มนอนหลับ", "ชีวิตที่มีความหมายคือการเข้าใจความมีอยู่ของตนเอง", "การยอมรับว่าชีวิตเป็นทุกข์"], answer: 3 },
+        { question: "8. ข้อใดเป็นจริงเกี่ยวกับธรรมชาตินิยม", options: ["ความหมายชีวิตแบบธรรมชาตินิยมส่งเสริมให้ไม่เคารพกฎศีลธรรม", "ธรรมชาตินิยมคือแนวคิดที่สนใจเพียงชีวิตของตนเอง ไม่ต้องทำเพื่อคนอื่น", "กฎเกณฑ์ธรรมชาติเป็นสิ่งที่มนุษย์ควบคุมได้", "ความหมายชีวิตเป็นสิ่งที่มนุษย์กำหนดด้วยตัวเอง", "การทำนายดวงชะตาช่วยให้รู้อนาคตของชีวิต"], answer: 3 },
+        { question: "9. ข้อใด \"ไม่ใช่\" แนวคิดเกี่ยวกับความหมายชีวิต", options: ["เหตุผลนิยม", "อัตวิสัยนิยม", "เป้าหมายชีวิตตามหลักธรรมศาสนา", "วัตถุนิยม", "เหนือธรรมชาตินิยม"], answer: 0 },
+        { question: "10. ประโยชน์ของ Mindfulness ต่อสมองคืออะไร", options: ["ลดขนาด Prefrontal Cortex", "ไม่มีผลต่อโครงสร้างสมอง", "ลดขนาด Hippocampus", "เพิ่มขนาด Amygdala", "เพิ่มความหนาของ Prefrontal Cortex และลดขนาด Amygdala"], answer: 4 },
+        { question: "11. งานวิจัย Harvard Study of Adult Development พบว่าปัจจัยใดทำนายความสุขในวัยชราได้ดีที่สุด", options: ["ความสำเร็จในอาชีพ", "ความมั่งคั่งทางการเงิน", "สุขภาพร่างกายที่แข็งแรง", "ระดับการศึกษา", "คุณภาพของความสัมพันธ์"], answer: 4 },
+        { question: "12. ข้อใดเป็นเงื่อนไขการเกิด Flow", options: ["งานที่ไม่มีเป้าหมาย", "งานยากมากจนทำไม่ได้", "งานท้าทายพอดีกับทักษะ", "งานง่ายมากจนไม่ต้องคิด", "งานที่ไม่ได้รับ feedback"], answer: 2 },
+        { question: "13. ข้อใดเป็นประโยชน์ของการคิดเชิงบวกต่อสุขภาพกาย", options: ["ลดระดับ Cortisol และความดันโลหิต", "เพิ่มความเสี่ยงโรคหัวใจ", "ลดการทำงานของระบบภูมิคุ้มกัน", "เพิ่มระดับ Cortisol", "เพิ่มความดันโลหิต"], answer: 0 },
+        { question: "14. ข้อใดไม่ใช่วิธีการฝึกสร้างความคิดเชิงบวก", options: ["หมั่นบอกกับตัวเองในเรื่องที่ดี", "มองวิกฤติให้เป็นโอกาส", "มองตัวเองในแง่ดี", "ใช้ประโยชน์จากคำว่า \"ขอบคุณ\"", "ปฏิเสธความรู้สึกลบทุกชนิด"], answer: 4 },
+        { question: "15. ตัวอักษร A ใน PERMA หมายถึงอะไร", options: ["Acceptance (การยอมรับ)", "Appreciation (การขอบคุณ)", "Awareness (การตระหนักรู้)", "Adaptation (การปรับตัว)", "Accomplishment (ความสำเร็จ)"], answer: 4 },
+        { question: "16. Beck's Cognitive Triad หมายถึงการคิดลบเกี่ยวกับอะไรบ้าง", options: ["ครอบครัว เพื่อน สังคม", "งาน การเงิน ความรัก", "อดีต ปัจจุบัน อนาคต", "ร่างกาย จิตใจ อารมณ์", "ตัวเอง โลก อนาคต"], answer: 4 },
+        { question: "17. การฝึก Body Scan ควรทำอย่างไร", options: ["เปลี่ยนความรู้สึกที่ไม่ดีให้ดีขึ้น", "สังเกตความรู้สึกทางกายโดยไม่ต้องเปลี่ยนแปลงอะไร", "กดจุดที่เจ็บปวดให้หายไป", "กดจุดที่เจ็บปวดให้หายไป", "พยายามผ่อนคลายกล้ามเนื้อทุกส่วน"], answer: 1 },
+        { question: "18. หลังอาการดีขึ้นแล้ว ควรทานยาแก้เศร้าต่อไปอีกนานเท่าไร", options: ["6-12 เดือน", "หยุดได้ทันที", "ตลอดชีวิต", "1-2 เดือน", "1-2 สัปดาห์"], answer: 0 },
+        { question: "19. เทคนิคหายใจ 4-7-8 มีขั้นตอนอย่างไร", options: ["หายใจเข้า 4, กลั้น 7, ออก 8", "หายใจเข้า 4, ออก 7, กลั้น 8", "หายใจเข้า 4, ออก 4, กลั้น 8", "หายใจเข้า 8, กลั้น 7, ออก 4", "หายใจเข้า 7, กลั้น 4, ออก 8"], answer: 0 },
+        { question: "20. ควรหลีกเลี่ยงการตระหนักถึงความตายเพราะการคิดถึงความตายทำให้ชีวิตขาดแรงจูงใจและทำให้คุณค่าในชีวิตลดลง", options: ["True", "False"], answer: 1 },
+        { question: "21. วิธีการวัดความสำเร็จของ Dave Mustaine ด้วยการต้อง “ดังกว่า Metallica” แม้จะช่วยให้เขาประสบความสำเร็จในอาชีพนักดนตรี แต่ก็ทำให้เขาเกิดความทุกข์ใจ แสดงให้เห็นว่าหากต้องการเปลี่ยนมุมมองต่อปัญหาในชีวิต จำเป็นต้องเปลี่ยน “วิธีการวัดความสำเร็จ” ของตนเองด้วย", options: ["True", "False"], answer: 0 },
+        { question: "22. การทำสิ่งที่ยาก เครียด และต้องใช้ความพยายามในระยะยาว (เช่น การวิ่งมาราธอนหรือการเลี้ยงดูบุตร) ไม่ได้มีแนวโน้มสร้างความหมายและคุณค่าในชีวิตมากกว่าความสุขระยะสั้นจากความสบายหรือความบันเทิง", options: ["True", "False"], answer: 1 },
+        { question: "23. ด้วยแก่นแท้แล้ว “การพัฒนาตนเอง” คือการจัดเรียงลำดับความสำคัญ", options: ["True", "False"], answer: 0 }
+    ];
+
+    // ================== DATA ชุดที่ 2 (อัปเดตข้อ 1-27 ให้ตรงไฟล์ PDF + ข้อ 28-40 ของเดิม) ==================
+    const quizData2 = [
+        { question: "1. จากบทความ 'Work-Life Balance ที่เหมาะสมควรจะเป็นอย่างไร?' ในคอลัมน์ GM Biz อัพเดทโลก อัพเดทเทรนด์ธุรกิจ กล่าวถึงการกำหนดแผนผังที่อธิบายขั้นตอนอันจะนำไปสู่ดุลยภาพของงาน 4 ขั้นตอนจาก นักวิชาการพฤติกรรมองค์กรชื่อ Perrewe และ Hochwarter ที่ว่าข้อใดไม่ใช่หนึ่งใน 4 ขั้นตอนดังกล่าว", options: ["ความสอดคล้องกันระหว่างค่านิยมในเนื้องานหนึ่งๆ กับค่านิยมส่วนตัว", "ค่านิยมในครอบครัวของผู้ทำงาน", "ค่านิยมทั่วไปของคนในทางถิ่นหนึ่งๆ", "วัฒนธรรมองค์กร"], answer: 1 },
+        { question: "2. ดร.เอกฤทธิ์ เลี้ยงพาณิชย์ ชี้ว่าเดิมทีดุลยภาพระหว่างชีวิตกับการทำงานนั้น ขัดแย้งหรือมีลักษณะตรงกับบุคคลในข้อใดมากที่สุด", options: ["คนที่ไม่มีโรคภัยไข้เจ็บใดๆ แต่เขาไม่สามารถดึงประสิทธิภาพในการทำงาน ออกมาได้เอง", "คนเกียจคร้านในการทำงานทั้งที่ยังไม่รวย", "คนที่ไม่มีโรคภัยไข้เจ็บใดๆ แต่ผู้บริหารไม่อาจดึงประสิทธิภาพในการทำงานของเขาออกมาได้", "คนที่หักโหมในการทำงานทั้งที่รวยอยู่แล้ว"], answer: 3 },
+        { question: "3. จากเอกสารประกอบการสอน กล่าวถึงปาฐกถาบน TEDx Talks ตอนหนึ่งซึ่งแสดงโดย Michael Walters โดยในเอกสารมีการวิเคราะห์รูปแบบเชิงตรรกที่ปรากฏในปาฐกถาดังกล่าว คือ ข้ออ้าง 1: ถ้าการทำงานและชีวิตสามารถแยกออกจากกันได้แต่แรก (A) ความสัมพันธ์ของการทำงานและชีวิตก็เกิดขึ้นในภายหลัง (B) ข้ออ้าง 2: (~B) ข้อสรุป: ดังนั้นจึงไม่จริงที่ว่าการทำงานและชีวิตสามารถแยกออกจากกันได้แต่แรก (~A) ข้อความที่เว้นไว้ในช่องว่างของข้ออ้าง 2 นั้น คือข้อความใด", options: ["ไม่จริงที่ว่าความสัมพันธ์ของการทำงานและชีวิตจะเกิดขึ้นในอนาคต", "ไม่จริงที่ว่าความสัมพันธ์ของการทำงานและชีวิตมีร่วมกันมาโดยตลอด", "ไม่จริงที่ว่าความสัมพันธ์ของการทำงานและชีวิตไม่ได้เกิดขึ้นในภายหลัง", "ไม่จริงที่ว่าความสัมพันธ์ของการทำงานและชีวิตเกิดขึ้นในภายหลัง"], answer: 3 },
+        { question: "4. นักวิชาการชื่อ P.Delecta กล่าวถึงคำนิยามของความสมดุลระหว่างชีวิตและการทำงานว่าหมายถึง 'ความสามารถของ.........ที่จะทำให้เกิดความบรรจบกันพอดีซึ่งการงานและพันธกิจทางชีวิตครอบครัวของเขา รวมทั้งบรรจบกันพอดีกับความรับผิดชอบและกิจกรรมที่ไม่เกี่ยวข้องกับหน้าที่การงาน' คำที่เว้นไว้ในช่องว่างคืออะไร", options: ["ผู้กระทำการทางสังคม", "ปัจเจกภาพ", "ปัจเจกบุคคล", "แรงงาน"], answer: 2 },
+        { question: "5. ไฟล์วีดิทัศน์ของท้อฟฟี่ แบรดชอว์และบองเต่า ดังที่ศึกษาในชั้นเรียน ชี้ว่าในปัจจุบันมีคำใหม่ที่ทำให้เกิดความเข้าใจความสมดุลระหว่างชีวิตกับการทำงานได้มากขึ้นอีก คำนั้นคือคำว่าอะไร", options: ["ความสละสลวยของชีวิตกับการทำงาน (work-life euphemisms)", "การแยกแยะระหว่างชีวิตกับการทำงาน (work-life differentiation)", "การเพิ่มคุณค่าในงาน (job enrichment)", "การบูรณาการระหว่างชีวิตกับการทำงาน (work-life integration)"], answer: 3 },
+        { question: "6. จากบทความ 'WORK AND LIFE BALANCE: สมดุลระหว่างงานกับชีวิต' โดย ประกาย ธีระวัฒนากุล กล่าวถึงการวัดความสมดุลระหว่างงานและชีวิตที่เกี่ยวกับการใช้เวลา ทั้งนี้ก็มีดัชนีวัดทั่วไปหลายประการ ที่ว่าข้อใดไม่ใช่หนึ่งในดัชนีชี้วัดเหล่านั้น", options: ["ชั่วโมงทำงาน", "อัตราการจ้างงานของมารดาที่มีเด็กอยู่ในวัยเรียนภาคบังคับ", "เวลาในการเดินทาง", "อัตราค่าจ้าง"], answer: 3 },
+        { question: "7. จากบทความ 'Work-Life Balance ที่เหมาะสมควรจะเป็นอย่างไร?' ในคอลัมน์ GM Biz อัพเดทโลก อัพเดทเทรนด์ธุรกิจ กล่าวถึงการกำหนดแผนผังที่อธิบายขั้นตอนอันจะนำไปสู่ดุลยภาพของงาน 4 ขั้นตอนจาก นักวิชาการพฤติกรรมองค์กรชื่อ Perrewe และ Hochwarter ที่ว่าข้อใดไม่ใช่หนึ่งใน 4 ขั้นตอนดังกล่าว", options: ["ความสอดคล้องกันระหว่างค่านิยมในเนื้องานหนึ่งๆ กับค่านิยมส่วนตัว", "ค่านิยมในครอบครัวของผู้ทำงาน", "ค่านิยมทั่วไปของคนในทางถิ่นหนึ่งๆ", "ค่านิยมและความต้องการของที่บ้าน"], answer: 1 },
+        { question: "8. ข้อใดไม่ใช่คุณลักษณะของภาวะผู้นำตามที่ Frigon and Jackson ระบุไว้", options: ["สามารถควบคุมอารมณ์ได้เป็นอย่างดี", "มีความน่าเชื่อถือไว้ใจได้และมีความมานะอดทน", "มีความความเป็นผู้ประกอบการ", "มีความคิดริเริ่มสร้างสรรค์"], answer: 2 },
+        { question: "9. ข้อใดกล่าวถูกต้องเกี่ยวกับปัจจัยที่ส่งผลต่อภาวะผู้นำในบริบทพฤติกรรมองค์กร", options: ["ถูกทุกข้อ(ในข้อสอบเก่ามันมีแค่ช้อยนี้ให้อะ จำว่ามีถูกทุกข้อก็เดาไว้ก่อนว่าตอบอันนี้"], answer: 0 },
+        { question: "10. ข้อใดกล่าวถูกต้องเกี่ยวกับแนวคิดผู้นำเชิงพฤติกรรม (Behavioral Approach)", options: ["ถูกทุกข้อ(เหตุผลเหมือนข้อ9)"], answer: 0 },
+        { question: "11. ข้อใดกล่าวถูกต้องเกี่ยวกับแนวคิด Kurt Lewin's Studies ตามแนวคิดผู้นำเชิงพฤติกรรม (Behavioral Approach)", options: ["Kurt Lewin แบ่งผู้นำออกเป็น 4 ลักษณะได้แก่ ผู้นำแบบอัตรานิยม ผู้นำแบบใช้ อำนาจ ผู้นำแบบประชาธิปไตย และผู้นำแบบเสรีนิยม", "ผู้นำแบบอัตถนิยม (Autocratic Leaders) เป็นผู้นำที่ใช้อำนาจของตนเองในการตัดสินใจ แต่ยังให้ผู้ใต้บังคับบัญชาแสดงความคิดเห็นต่างๆ ได้", "ผู้นำแบบประชาธิปไตย (Democratic Leaders) เป็นผู้นำที่ใช้เสียงส่วนใหญ่ในการตัดสินใจ ส่งผลให้การทำงานต่างๆ เสร็จสิ้นอย่างรวดเร็วที่สุดเสมอ", "ผู้นำแบบเสรีนิยม (Laissez-Faire Leaders) เป็นผู้นำที่ให้อิสระแก่ผู้ใต้บังคับบัญชาในการตัดสินใจในการทำงานอย่างเต็มที่ ไม่ค่อยจะกำหนดเป้าหมาย หลักเกณฑ์และกฎระเบียบในการทำงาน"], answer: 3 },
+        { question: "12. ข้อใดกล่าวถูกต้องเกี่ยวกับแนวคิด Blake and Mouton's Managerial Grid ตามแนวคิดผู้นำเชิงพฤติกรรม (Behavioral Approach)", options: ["Blake and Mouton แบ่งผู้นำออกเป็น 3 ลักษณะ ได้แก่ ผู้นำแบบมุ่งงาน ผู้นำแบบทางสายกลาง และผู้นำแบบทำงานเป็นทีม", "ผู้นำแบบมุ่งงาน เป็นผู้นำที่มีพฤติกรรมแบบเผด็จการ ผู้นำจะเป็นผู้วางแผนกำหนดแนวทางการปฏิบัติและออกคำสั่งให้ผู้ใต้บังคับบัญชาปฏิบัติโดยไม่สนใจสัมพันธภาพของผู้ร่วมงาน", "ผู้นำแบบสายกลาง เป็นผู้นำที่ไม่สนใจบุคลากรและผลการทำงาน มุ่งเพียงแต่ใช้กฎระเบียบแบบแผนในการควบคุมการทำงานเท่านั้น", "ผู้นำแบบทำงานเป็นทีม เป็นผู้นำที่เน้นการใช้มนุษยสัมพันธ์และความพึงพอใจของผู้ตามเป็นสำคัญโดยไม่คำนึงถึงผลผลิตขององค์กร"], answer: 1 },
+        { question: "13. ข้อใดกล่าวถูกต้องเกี่ยวกับแนวคิด McGregor's: Theory X และ Theory Y ตามแนวคิดผู้นำเชิงพฤติกรรม", options: ["ถูกทุกข้อ(เหมือนข้อ9อีกละ)"], answer: 0 },
+        { question: "14. ข้อใดกล่าวถูกต้องเกี่ยวกับแนวคิดผู้นำเชิงเหตุการณ์หรือเชิงสถานการณ์ (Situational Approach)", options: ["ถูกทุกข้อ(อีกแล้ว)"], answer: 0 },
+        { question: "15. “เรามีชีวิตอยู่เพื่ออะไร” ความหมายในชีวิตแต่ละคนแตกต่างกัน บางคนขึ้นกับชื่อเสียงเงินทอง บางคนคือการได้ดูแลครอบครัว ลักษณะดังกล่าวเป็นลักษณะของข้อใดใน PERMA model", options: ["Accomplishment", "Relationship", "Engagement", "Meaning"], answer: 3 },
+        { question: "16. Psychosomatic disorder คืออาการในข้อใด", options: ["การเจ็บป่วยทางใจอันเนื่องมาจากทางกาย", "การเจ็บป่วยที่ตรวจพบว่ามีเส้นเลือดในสมองแตก", "การเจ็บป่วยที่เกิดขึ้นในกลุ่มคนที่อยู่ทางซีกโลกตะวันตก", "การเจ็บป่วยทางกายอันเนื่องมาจากจิตใจ"], answer: 3 },
+        { question: "17. ข้อใดกล่าวถึง Ego ตามแนวคิดจิตวิเคราะห์ของ Sigmund Freud ได้อย่างถูกต้อง", options: ["เป็นส่วนที่ควบคุมในเรื่องความถูกต้องและศีลธรรมอันดีงามทั้งหมด", "ใช้หลักการตามหลัก Reality", "เป็นระดับโครงสร้างทางจิตที่ติดตัวมนุษย์มาตั้งแต่กำเนิดโดยไม่มีการพัฒนาทีหลัง", "ทำงานอยู่เฉพาะในระดับจิตใต้สำนึกที่มนุษย์ไม่สามารถเข้าถึงได้เลย"], answer: 1 },
+        { question: "18. “การมีส่วนร่วมกับสิ่งนั้นๆ อย่างแท้จริง การที่ได้ทำงานที่เรารัก การอยู่ด้วยกับคนที่เรารัก หรือสิ่งต่างๆ ทำให้เรามีความสุข” ลักษณะดังกล่าวเป็นลักษณะของข้อใดใน PERMA model", options: ["Positive Emotion", "Relationship", "Accomplishment", "Engagement"], answer: 3 },
+        { question: "19. ข้อใดไม่ใช่ลักษณะหรือองค์ประกอบของการคิดเชิงบวก (Positive Thinking)", options: ["Pessimistic", "Appreciate individuality of people around them", "Accept change easily", "Optimism"], answer: 0 },
+        { question: "20. “ความสัมพันธ์ที่ดีกับคนรอบข้าง เป็นสิ่งที่ทุกคนรู้อยู่แล้วว่าจะทำให้ชีวิตประจำวันมีความสุข” ลักษณะดังกล่าวเป็นลักษณะของข้อใดใน PERMA model", options: ["Positive Emotion", "Relationship", "Meaning", "Engagement"], answer: 1 },
+        { question: "21. “การทำอะไรที่ประสบความสำเร็จ ก็ทำให้เกิดความสุขหรือความพอใจ” ลักษณะดังกล่าวเป็นลักษณะของข้อใดใน PERMA model", options: ["Meaning", "Accomplishment", "Relationship", "Positive Emotion"], answer: 1 },
+        { question: "22. “อารมณ์ดีชีวิตมีสุข การมีอารมณ์ในแง่บวก มองโลก in แง่ดี” ลักษณะดังกล่าวเป็นลักษณะของข้อใดใน PERMA model", options: ["Meaning", "Accomplishment", "Relationship", "Positive"], answer: 3 },
+        { question: "23. นักศึกษามหาวิทยาลัยโคลัมเบีย พูดถึงตัวเองในอดีต ไว้ดังนี้ '...ผมถูกชมเรื่องสติปัญญาบ่อยกว่าความพยายาม และแน่นอนว่าผมค่อยๆ รังเกียจเรื่องท้าทายที่ทำได้ยาก ปัญหานี้ทำให้ผมหลีกเลี่ยงการทำบางอย่าง...' ผลกระทบจากคำชมเหล่านี้ตามเนื้อความระบุถึงผลลัพธ์ในข้อใด", options: ["เห็นภาพผลงานคือความล้มเหลว", "คิดว่าตนเองมีพรสวรรค์เหนือผู้อื่นเสมอ", "การที่ความตั้งใจถดถอยลงโดยไร้สาเหตุ", "ความภาคภูมิใจในตัวเองที่ยั่งยืนยาวนาน"], answer: 0 },
+        { question: "24. ข้อใดไม่ใช่การปลูกฝังทักษะชีวิตให้กับเด็กเรื่องกรอบความคิดแบบเติบโต (Positive Growth Mindset)", options: ["ศักยภาพของสมอง (Brainology)", "ไม่พลาดเมื่อผิดพลาด (Mistake is interesting)", "แค่เขายังทำมันไม่เสร็จ (Power of YET)", "ชมที่กระบวนการและผลลัพธ์ (Praising process and outcome)"], answer: 3 },
+        { question: "25. การที่เด็กถูกจัดอยู่ในกลุ่มที่ไม่เก่ง จะทำให้เด็กมีกรอบความคิดแบบใดและเพราะสาเหตุในข้อใด", options: ["Fixed mindset เพราะเด็กกลุ่มไม่เก่ง คือคนที่เรียนรู้ได้น้อยโดยธรรมชาติ", "Growth mindset เพราะเด็กจะได้มีโอกาสเรียนรู้เพิ่มมากขึ้นอย่างอิสระ", "Fixed และ growth mindset ผสมกันขึ้นอยู่กับสภาพแวดล้อมทางครอบครัวเท่านั้น", "Fixed mindset เพราะเด็กถูกตัดสินและตีตราทำให้มีความเชื่อว่าตนเองไม่เก่งและพัฒนาไม่ได้"], answer: 3 },
+        { question: "26. การนำ Growth Mindset ไปใช้ในโรงเรียน พบว่ามีการเพิ่มผลสัมฤทธิ์ทางการเรียนในหลายเขตการศึกษาของสหรัฐ ข้อใดต่อไปนี้เป็นขั้นตอนตามแนวทาง Growth mindset จากทั้งหมด 7 ขั้นตอน", options: ["คิดว่าจะพลาดตรงไหน-ลงมือทำ-ถึงเป้าหมาย", "อยากทำ-ทำอย่างไร-ลงมือทำ", "แก้ไขข้อผิดพลาด-ลงมือทำ-ฉันทำได้แล้ว", "ต้องทำอย่างไร-อยากทำ-ลงมือทำ"], answer: 1 },
+        { question: "27. ข้อใดไม่ใช่หลักการให้ข้อมูลป้อนกลับ (Feedback) ต่องานและพฤติกรรมของบุคคลเพื่อเพิ่มผลสัมฤทธิ์ในการเรียนและการทำงาน", options: ["STOP เทคนิค", "Objective เป็นรูปธรรม ข้อมูลเทียบกับผู้อื่น", "Timely ทันทีควร feedback ทันทีเพื่อการปรับปรุงที่รวดเร็ว", "Specific เจาะจง สิ่งที่ดี/ไม่ดีอะไรที่พัฒนาต่อได้"], answer: 1 },
+        { question: "28. การชมเด็กว่าฉลาดกลับทำให้ทำสิ่งที่โง่ลงเรื่อยๆ ตามแนวคิด Growth mindset ทำไมจึงเป็นเช่นนั้น", options: ["คำชื่นชมเหล่านี้ทำให้เด็กมีการเรียนรู้เพิ่มขึ้นเล็กน้อย", "คำชื่นชมเหล่านี้มีความสำคัญเช่นกันในผู้ใหญ่มากกว่าเด็ก", "คำชื่นชมเหล่านี้เป็นสิ่งที่ไม่ได้พูดถึงความพยายาม", "คำชื่นชมเด็กเช่นนี้ทำให้เด็กไม่หลีกเลี่ยงความผิดพลาด", "คำชื่นชมว่าเด็กฉลาดเป็นการตัดสินใจจากการวัดผลอนาคต"], answer: 2 },
+        { question: "29. ข้อใดกล่าว 'ไม่ถูกต้อง' เกี่ยวกับปัจจัยทางชีวภาพของโรคซึมเศร้า", options: ["เกิดจากความบกพร่องของสารสื่อประสาท เช่น Serotonin และ Norepinephrine", "ฮอร์โมน Vasopressin เป็นสาเหตุหลักโดยตรงในการควบคุมอารมณ์เศร้า", "พันธุกรรมมีส่วนเกี่ยวข้องกับอัตราการเกิดโรคซึมเศร้า", "ยารักษาโรคซึมเศร้าจะช่วยปรับสมดุลเคมีในสมองได้"], answer: 1 },
+        { question: "30. ข้อใดกล่าว 'ถูกต้อง' เกี่ยวกับลักษณะความคิดของผู้ป่วยโรคซึมเศร้า", options: ["ผู้ป่วยทุกคนสามารถใช้เหตุผลแก้ไขความเศร้าได้เองโดยไม่ต้องพึ่งยา", "โรคซึมเศร้าเกิดจากความอ่อนแอทางจิตใจของตัวบุคคลเท่านั้น", "ผู้ป่วยโรคซึมเศร้ามักมีความคิดเชิงลบที่ไม่อยู่บนฐานความเป็นจริง (Cognitive Distortion)", "ความคิดของผู้ป่วยจะมีความกระตือรือร้นต่อสิ่งใหม่ๆ ตลอดเวลา"], answer: 2 },
+        { question: "31. โรคทางกายและจิตใจที่เกิดจากการทำงานหนักหักโหมมากเกินไปจนเสียชีวิต มีชื่อเรียกเฉพาะว่าอย่างไร", options: ["โรคคาวาซากิ", "โรคมินามาตะ", "โรคชิคุนกุนย่า", "โรคคาโรชิ (Karoshi)"], answer: 3 },
+        { question: "32. ข้อใดส่งผลเสียและ 'ไม่ใช่' ประโยชน์ที่ถูกต้องของการคิดเชิงบวก (Positive Thinking)", options: ["ช่วยลดระดับฮอร์โมน Cortisol และลดความดันโลหิต", "เพิ่มอัตราการเสียชีวิต (Increase the death rate) และลดการทำงานของภูมิคุ้มกัน", "ช่วยปรับเปลี่ยนมุมมองให้มองวิกฤตเป็นโอกาส", "ส่งเสริมสัมพันธภาพอันดีกับบุคคลรอบข้าง"], answer: 1 },
+        { question: "33. ตามทฤษฎีภูเขาน้ำแข็งของ Sigmund Freud 'ส่วนของจิตใจที่อยู่พ้นผิวน้ำขึ้นมา' หมายถึงระดับจิตใด", options: ["จิตสำนึก (Conscious mind)", "จิตกึ่งสำนึก (Preconscious mind)", "จิตใต้สำนึก/จิตไร้สำนึก (Unconscious mind)", "จิตเหนือสำนึก (Superconscious mind)"], answer: 0 },
+        { question: "34. โครงสร้างบุคลิกภาพที่เรียกว่า 'Ego' ทำงานสอดคล้องกับหลักการใดเป็นสำคัญ", options: ["ทำงานตามหลักความพึงพอใจสูงสุด (Pleasure Principle)", "ทำงานตามหลักจริยธรรมและความถูกต้องค้ำจุนสังคม (Morality Principle)", "ทำงานตามหลักแห่งความเป็นจริงและเหตุผล (Reality Principle)", "ทำงานตามสัญชาตญาณดิบดั้งเดิมไร้การควบคุม"], answer: 2 },
+        { question: "35. อาการในข้อใดที่ 'ไม่ใช่' อาการที่เกี่ยวข้องกันหรือบ่งชี้ว่าเป็นโรคซึมเศร้า", options: ["มีอารมณ์เศร้า หดหู่ หรือเบื่อหน่ายสิ่งที่เคยชอบ", "รู้สึกกระฉับกระเฉง กระปรี้กระเปร่า มีพลังงานล้นเหลือผิดปกติ", "นอนไม่หลับหรือนอนมากเกินไปแทบทุกวัน", "สมาธิลดลง อ่อนเพลีย ไร้เรี่ยวแรง"], answer: 1 },
+        { question: "36. ระดับจิตใจแบบ 'จิตกึ่งสำนึก' (Preconscious mind) มีความหมายตรงกับข้อใดมากที่สุด", options: ["ระดับจิตใจที่เราตระหนักรู้และรับรู้อยู่ในปัจจุบันขณะ", "ระดับจิตใจที่ไม่รับรู้ในบางขณะ แต่สามารถระลึกขึ้นได้เมื่อถูกกระตุ้นหรือพยายามนึกถึง", "ระดับจิตใจที่เก็บซ่อนความต้องการลึกๆ ที่ไม่ยอมรับและแสดงออกไม่ได้", "พฤติกรรมอัตโนมัติของร่างกายที่เกิดขึ้นโดยไม่มีระบบสมองสั่งการ"], answer: 1 },
+        { question: "37. ข้อใดอธิบายวิธีการพูดคุยที่เหมาะสมกับบุคคลสไตล์ลักษณ์ 1 'คนสมบูรณ์แบบ (Perfectionist)' ได้ดีที่สุด", options: ["อย่าวิจารณ์หรือสั่งการเขา แต่ให้ข้อเสนอแนะระยะสั้นและระยะกลางเท่านั้น", "พยายามพูดจาเยินยอชื่นชมในความเก่งกาจของเขาตลอดเวลา", "บอกเขาตรงๆ เมื่อเห็นข้อผิดพลาด และขอโทษหากเราติเตียน เพื่อสื่อว่าทุกคนผิดพลาดได้", "ถ้าชวนคุยประเด็นใดให้พยายามพูดคุยยืดยาวลงลึกรายละเอียดให้มากที่สุด"], answer: 2 },
+        { question: "38. ข้อใดอธิบายวิธีการพูดคุยที่เหมาะสมกับบุคคลสไตล์ลักษณ์ 7 'นักผจญภัย/มองโลกในแง่ดี (Optimistic)'", options: ["อย่าวิจารณ์หรือสั่งการเขาตรงๆ แต่พยายามเสนอแนะทางเลือกแนวทางในระยะสั้น-ระยะกลาง", "กำหนดกฎระเบียบและตารางเวลาที่เคร่งครัดกดดันให้เขาทำตามทันที", "ชวนพูดคุยแต่ประเด็นความล้มเหลวและเรื่องเครียดในอดีตยาวๆ", "พยายามควบคุมและจำกัดกรอบความคิดของเขาไม่ให้คิดนอกกรอบ"], answer: 0 },
+        { question: "39. ข้อใดอธิบายวิธีการพูดคุยที่เหมาะสมกับบุคคลสไตล์ลักษณ์ 3 'ผู้ใใฝ่สำเร็จ (Successful Achiever)'", options: ["ชวนคุยรายละเอียดปลีกย่อยนอกเรื่องให้ยาวนานที่สุดเพื่อผูกมิตร", "เน้นประเด็นที่กระชับ ตรงเป้าหมาย เพราะหากคุยยืดยาวเกินไปเขาจะปิดตัวเองทันที", "ตั้งคำถามจี้จุดถึงความล้มเหลวในอดีตเพื่อให้เขาเกิดความกลัว", "หลีกเลี่ยงการพูดถึงเรื่องงานและความสำเร็จในอนาคต"], answer: 1 },
+        { question: "40. บุคคลที่มีแรงขับเคลื่อนภายในคือ 'ต้องการเป็นที่รัก มีคนเห็นคุณค่าของตนเอง' จัดเป็นคนลักษณ์ใดตามโมเดล Enneagram", options: ["ลักษณ์ 1 คนสมบูรณ์แบบ (Perfectionist)", "ลักษณ์ 2 ผู้ให้ (Supportive Advisor)", "ลักษณ์ 3 ผู้ใฝ่สำเร็จ (Successful Achiever)", "ลักษณ์ 7 นักผจญภัย (Optimistic)"], answer: 1 }
+    ];
+
+    // ================== DATA ชุดที่ 3 (คงที่ 9 ข้อ นิยาม -> ลักษณ์) ==================
+    const quizData3 = [
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'ต้องการดำเนินชีวิตในแบบที่ถูกต้อง ต้องการปรับปรุงตนเองและสิ่งต่างๆ'?", 
+            options: ["ลักษณ์ 1 (Perfectionist ผู้ชอบความสมบูรณ์แบบ)", "ลักษณ์ 3 (Achiever ผู้ใฝ่ความสำเร็จ)", "ลักษณ์ 5 (Thinker นักคิด นักสังเกต)", "ลักษณ์ 9 (Mediator ผู้รักสงบ ผู้ไกล่เกลี่ย คนกลาง)"], 
+            answer: 0 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'ต้องการเป็นที่รัก มีคนเห็นคุณค่า และแสดงความรู้สึกดีๆ ต่อผู้อื่น'?", 
+            options: ["ลักษณ์ 6 (Guardian นักจงรักภักดี ผู้ปกครอง ผู้พิทักษ์)", "ลักษณ์ 2 (Adviser ผู้ให้ ผู้ช่วยเหลือ)", "ลักษณ์ 8 (Challenger ผู้นำ ชอบความท้าทาย)", "ลักษณ์ 4 (Individualist ศิลปิน)"], 
+            answer: 1 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'ต้องการสร้างผลงาน ความสำเร็จและหลีกเลี่ยงความล้มเหลว'?", 
+            options: ["ลักษณ์ 7 (Optimist นักผจญภัย รักสนุก)", "ลักษณ์ 1 (Perfectionist ผู้ชอบความสมบูรณ์แบบ)", "ลักษณ์ 3 (Achiever ผู้ใฝ่ความสำเร็จ)", "ลักษณ์ 5 (Thinker นักคิด นักสังเกต)"], 
+            answer: 2 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'ต้องการสัมผัสความรู้สึกของตัวเอง ต้องการให้ผู้อื่นเข้าใจ ค้นหาความหมายของชีวิตและหลีกเลี่ยงความสามัญธรรมดา'?", 
+            options: ["ลักษณ์ 2 (Adviser ผู้ให้ ผู้ช่วยเหลือ)", "ลักษณ์ 4 (Individualist ศิลปิน)", "ลักษณ์ 9 (Mediator ผู้รักสงบ ผู้ไกล่เกลี่ย คนกลาง)", "ลักษณ์ 6 (Guardian นักจงรักภักดี ผู้ปกครอง ผู้พิทักษ์)"], 
+            answer: 1 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'ต้องการที่จะรู้และเข้าใจสิ่งต่างๆ มีความเพียงพอในตัวเอง และไม่ทำตัวให้ดูเหมือนโง่'?", 
+            options: ["ลักษณ์ 3 (Achiever ผู้ใฝ่ความสำเร็จ)", "ลักษณ์ 8 (Challenger ผู้นำ ชอบความท้าทาย)", "ลักษณ์ 1 (Perfectionist ผู้ชอบความสมบูรณ์แบบ)", "ลักษณ์ 5 (Thinker นักคิด นักสังเกต)"], 
+            answer: 3 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'ต้องการความมั่นคง (ลักษณ์นี้แบบกลัวแล้วถอย จะไม่มีทางที่กลัวและมองหาการยอมรับ ส่วนลักษณ์นี้แบบสู้ความกลัว จะเดินเข้าชนสิ่งที่ทำให้กลัว)'?", 
+            options: ["ลักษณ์ 6 (Guardian นักจงรักภักดี ผู้ปกครอง ผู้พิทักษ์)", "ลักษณ์ 2 (Adviser ผู้ให้ ผู้ช่วยเหลือ)", "ลักษณ์ 7 (Optimist นักผจญภัย รักสนุก)", "ลักษณ์ 4 (Individualist ศิลปิน)"], 
+            answer: 0 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'ต้องการหาความสุข คิดแผนทำกิจกรรมสนุกๆ สร้างสิ่งดีๆ ให้กับโลกและหลีกเลี่ยงเรื่องเจ็บปวดและทุกข์ใจ'?", 
+            options: ["ลักษณ์ 9 (Mediator ผู้รักสงบ ผู้ไกล่เกลี่ย คนกลาง)", "ลักษณ์ 5 (Thinker นักคิด นักสังเกต)", "ลักษณ์ 7 (Optimist นักผจญภัย รักสนุก)", "ลักษณ์ 1 (Perfectionist ผู้ชอบความสมบูรณ์แบบ)"], 
+            answer: 2 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'การพึ่งตัวเอง แสดงความเข้มแข็ง และหลีกเลี่ยงความรู้สึกอ่อนแอหรือต้องขึ้นอยู่กับผู้อื่น'?", 
+            options: ["ลักษณ์ 4 (Individualist ศิลปิน)", "ลักษณ์ 8 (Challenger ผู้นำ ชอบความท้าทาย)", "ลักษณ์ 2 (Adviser ผู้ให้ ผู้ช่วยเหลือ)", "ลักษณ์ 6 (Guardian นักจงรักภักดี ผู้ปกครอง ผู้พิทักษ์)"], 
+            answer: 1 
+        },
+        { 
+            question: "แรงจูงใจของลักษณ์ใดคือ 'รักษาความปรองดอง กลมกลืนกับผู้อื่น และหลีกเลี่ยงความขัดแย้ง'?", 
+            options: ["ลักษณ์ 3 (Achiever ผู้ใฝ่ความสำเร็จ)", "ลักษณ์ 7 (Optimist นักผจญภัย รักสนุก)", "ลักษณ์ 8 (Challenger ผู้นำ ชอบความท้าทาย)", "ลักษณ์ 9 (Mediator ผู้รักสงบ ผู้ไกล่เกลี่ย คนกลาง)"], 
+            answer: 3 
+        }
+    ];
+
+    let currentTab = 1; 
+    let currentQuestion = 0;
+    let isShowingReference = false;
+    
+    // ที่เก็บคำตอบของแต่ละชุด
+    const userAnswers1 = new Array(quizData1.length).fill(null);
+    const userAnswers2 = new Array(quizData2.length).fill(null);
+    const userAnswers3 = new Array(quizData3.length).fill(null);
+
+    const navBar = document.getElementById('nav-bar');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const quizContent = document.getElementById('quiz-content');
+    const referenceContent = document.getElementById('reference-content');
+    const resultContent = document.getElementById('result-content');
+    const footerControls = document.getElementById('footer-controls');
+    const quizTitle = document.getElementById('quiz-title');
+
+    function initQuiz() {
+        let quizData = currentTab === 1 ? quizData1 : (currentTab === 2 ? quizData2 : quizData3);
+        
+        if (currentTab === 1) quizTitle.innerText = "กำลังทำชุดทดสอบ: Quiz ในห้อง (23 ข้อ)";
+        else if (currentTab === 2) quizTitle.innerText = "กำลังทำชุดทดสอบ: ข้อสอบปีเก่า01 (40 ข้อ)";
+        else quizTitle.innerText = "กำลังทำชุดทดสอบ: Enneagram (9 ลักษณ์)";
+
+        createNavBar(quizData);
+        loadQuestion(currentQuestion);
+    }
+
+    function switchTab(tabNum) {
+        if (currentTab === tabNum) return;
+        currentTab = tabNum;
+        currentQuestion = 0; 
+        isShowingReference = false;
+        
+        document.getElementById('tab1-btn').classList.toggle('active', tabNum === 1);
+        document.getElementById('tab2-btn').classList.toggle('active', tabNum === 2);
+        document.getElementById('tab3-btn').classList.toggle('active', tabNum === 3);
+        
+        quizContent.style.display = 'block';
+        referenceContent.style.display = 'none';
+        navBar.style.display = 'flex';
+        footerControls.style.display = 'flex';
+        resultContent.style.display = 'none';
+        
+        initQuiz();
+    }
+
+    function showReference() {
+        isShowingReference = true;
+        quizContent.style.display = 'none';
+        resultContent.style.display = 'none';
+        referenceContent.style.display = 'block';
+        footerControls.style.display = 'none'; // ซ่อนปุ่มก่อน/หลังในหน้าอ้างอิง
+        createNavBar(quizData3); // อัพเดตปุ่มอ้างอิงให้ active
+    }
+
+    function createNavBar(quizData) {
+        let userAnswers = currentTab === 1 ? userAnswers1 : (currentTab === 2 ? userAnswers2 : userAnswers3);
+        navBar.innerHTML = '';
+        
+        for (let i = 0; i < quizData.length; i++) {
+            const btn = document.createElement('button');
+            btn.classList.add('nav-btn');
+            btn.innerText = i + 1;
+            btn.onclick = () => jumpToQuestion(i);
+            
+            if (i === currentQuestion && !isShowingReference) btn.classList.add('active');
+            
+            if (userAnswers[i] !== null) {
+                if (userAnswers[i] === quizData[i].answer) {
+                    btn.classList.add('correct-nav');
+                } else {
+                    btn.classList.add('incorrect-nav');
+                }
+            }
+            navBar.appendChild(btn);
+        }
+
+        // เพิ่มปุ่ม "อ้างอิง" เฉพาะแท็บ 3
+        if (currentTab === 3) {
+            const refBtn = document.createElement('button');
+            refBtn.classList.add('nav-btn', 'ref-btn');
+            refBtn.innerText = "อ้างอิง";
+            refBtn.onclick = () => showReference();
+            
+            if (isShowingReference) {
+                refBtn.classList.add('active');
+            }
+            navBar.appendChild(refBtn);
+        }
+    }
+
+    function loadQuestion(index) {
+        isShowingReference = false;
+        quizContent.style.display = 'block';
+        referenceContent.style.display = 'none';
+        footerControls.style.display = 'flex';
+
+        currentQuestion = index;
+        let quizData = currentTab === 1 ? quizData1 : (currentTab === 2 ? quizData2 : quizData3);
+        let userAnswers = currentTab === 1 ? userAnswers1 : (currentTab === 2 ? userAnswers2 : userAnswers3);
+        const q = quizData[index];
+        
+        if (currentTab === 3) {
+            questionText.innerText = `ข้อที่ ${index + 1}. ${q.question}`;
+        } else {
+            questionText.innerText = q.question;
+        }
+        
+        optionsContainer.innerHTML = '';
+        const hasAnswered = userAnswers[index] !== null;
+
+        q.options.forEach((opt, optIndex) => {
+            const optDiv = document.createElement('div');
+            optDiv.classList.add('option');
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'q_option';
+            radio.value = optIndex;
+            
+            if (hasAnswered) {
+                optDiv.classList.add('disabled');
+                radio.disabled = true;
+                if (userAnswers[index] === optIndex) radio.checked = true;
+                if (optIndex === q.answer) optDiv.classList.add('correct');
+                if (userAnswers[index] === optIndex && optIndex !== q.answer) optDiv.classList.add('incorrect');
+            } else {
+                optDiv.onclick = () => selectOption(optIndex);
+            }
+            
+            const label = document.createElement('span');
+            label.innerText = opt;
+            
+            optDiv.appendChild(radio);
+            optDiv.appendChild(label);
+            optionsContainer.appendChild(optDiv);
+        });
+
+        updateControls(quizData);
+        createNavBar(quizData); 
+    }
+
+    function selectOption(optIndex) {
+        let userAnswers = currentTab === 1 ? userAnswers1 : (currentTab === 2 ? userAnswers2 : userAnswers3);
+        userAnswers[currentQuestion] = optIndex;
+        loadQuestion(currentQuestion); 
+    }
+
+    function jumpToQuestion(index) {
+        loadQuestion(index);
+    }
+
+    function prevQuestion() {
+        if (currentQuestion > 0) loadQuestion(currentQuestion - 1);
+    }
+
+    function nextQuestion() {
+        let quizData = currentTab === 1 ? quizData1 : (currentTab === 2 ? quizData2 : quizData3);
+        let userAnswers = currentTab === 1 ? userAnswers1 : (currentTab === 2 ? userAnswers2 : userAnswers3);
+
+        if (currentQuestion < quizData.length - 1) {
+            loadQuestion(currentQuestion + 1);
+        } else {
+            if (userAnswers.includes(null)) {
+                alert("กรุณาทำแบบทดสอบชุดนี้ให้ครบทุกข้อก่อนส่งคำตอบครับ");
+                const firstUnanswered = userAnswers.indexOf(null);
+                jumpToQuestion(firstUnanswered);
+            } else {
+                showResult(quizData, userAnswers);
+            }
+        }
+    }
+
+    function updateControls(quizData) {
+        btnPrev.disabled = currentQuestion === 0;
+        if (currentQuestion === quizData.length - 1) {
+            btnNext.innerText = 'ส่งคำตอบ / ดูคะแนน';
+            btnNext.style.backgroundColor = '#2196F3';
+        } else {
+            btnNext.innerText = 'ถัดไป';
+            btnNext.style.backgroundColor = '#4CAF50';
+        }
+    }
+
+    function showResult(quizData, userAnswers) {
+        let score = 0;
+        userAnswers.forEach((ans, index) => {
+            if (ans === quizData[index].answer) score++;
+        });
+
+        quizContent.style.display = 'none';
+        referenceContent.style.display = 'none';
+        navBar.style.display = 'none';
+        footerControls.style.display = 'none';
+        resultContent.style.display = 'block';
+
+        document.getElementById('score-text').innerText = `${score} / ${quizData.length}`;
+    }
+
+    function resetCurrentQuiz() {
+        if (currentTab === 1) userAnswers1.fill(null);
+        else if (currentTab === 2) userAnswers2.fill(null);
+        else if (currentTab === 3) userAnswers3.fill(null);
+
+        currentQuestion = 0;
+        isShowingReference = false;
+        quizContent.style.display = 'block';
+        referenceContent.style.display = 'none';
+        navBar.style.display = 'flex';
+        footerControls.style.display = 'flex';
+        resultContent.style.display = 'none';
+        initQuiz();
+    }
+
+    // เริ่มทำงานครั้งแรก
+    initQuiz();
+</script>
+
+</body>
+</html>
