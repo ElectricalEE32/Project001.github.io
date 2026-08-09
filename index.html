@@ -110,6 +110,7 @@
                         <li onclick="filterExams('machine')" id="menu-machine">⚙️ Machine</li>
                         <li onclick="filterExams('heat')" id="menu-heat">🔥 heat</li>
 						<li onclick="filterExams('highvolt')" id="menu-highvolt">⚡ Highvolt</li>
+						<li onclick="filterExams('Measure')" id="menu-Measure">📐 Measurement</li>
                     </ul>
                 </li>
 
@@ -302,6 +303,7 @@
                         else if (fileNameLower.includes("eng4")) fileCategory = "Eng4";
                         else if (fileNameLower.includes("eng5")) fileCategory = "Eng5";
 						else if (fileNameLower.includes("highvolt")) fileCategory = "Highvolt";
+						else if (fileNameLower.includes("measure")) fileCategory = "Measure";
 			else if (fileNameLower.includes("health")) fileCategory = "health";
 
                         let displayName = file.name.replace('.html', '').replace('.pdf', '');
