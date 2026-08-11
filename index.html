@@ -123,7 +123,8 @@
 						<li onclick="filterExams('health')" id="menu-health">🩺 Holistic health</li>
 						<li onclick="filterExams('Virtual')" id="menu-Virtual">👨‍👨‍👧‍👧 Virtual</li>
 						<li onclick="filterExams('Manso')" id="menu-Manso">🌍 Manso</li>
-						<li onclick="filterExams('Asean')" id="menu-Asean">🌍 Asean</li>
+						<li onclick="filterExams('Asean')" id="menu-Asean">🤵🏻 Asean</li>
+						<li onclick="filterExams('Adol')" id="menu-Asean">👦🏻 ADOLESCENT AND YOUTH SAFETY</li>
 						
                     </ul>
                 </li>
@@ -312,6 +313,7 @@
 						else if (fileNameLower.includes("virtual")) fileCategory = "Virtual";
 						else if (fileNameLower.includes("manso")) fileCategory = "Manso";
 						else if (fileNameLower.includes("asean")) fileCategory = "Asean";
+						else if (fileNameLower.includes("adol")) fileCategory = "Adol";
 
                         let displayName = file.name.replace('.html', '').replace('.pdf', '');
 
