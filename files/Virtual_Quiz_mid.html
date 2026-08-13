@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ข้อสอบรายวิชา Virtual</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Sarabun', Tahoma, sans-serif;
+    background: #f4f6fa;
+    margin: 0;
+    padding: 0;
+    color: #2b2b2b;
+  }
+  header {
+    background: linear-gradient(135deg,#4b6cb7,#182848);
+    color: #fff;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 4px 0; font-size: 1.6em; }
+  header p { margin: 0; opacity: .85; font-size: .95em; }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    padding: 16px 10px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  }
+  .tab-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 20px;
+    background: #e8ecf5;
+    color: #333;
+    cursor: pointer;
+    font-size: .9em;
+    font-weight: 600;
+    transition: .2s;
+  }
+  .tab-btn:hover { background: #d3daf0; }
+  .tab-btn.active {
+    background: #4b6cb7;
+    color: #fff;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin: 10px 0 20px;
+    color: #182848;
+    border-left: 6px solid #4b6cb7;
+    padding-left: 12px;
+  }
+
+  .score-bar {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .score-bar span.score-num { color: #4b6cb7; font-size: 1.1em; }
+  .reset-btn {
+    border: none;
+    background: #eef1f8;
+    color: #4b6cb7;
+    padding: 6px 14px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: .85em;
+  }
+  .reset-btn:hover { background: #dfe5f5; }
+
+  .q-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    border-left: 5px solid #f5b942;
+  }
+  .q-card.answered-correct { border-left-color: #2ecc71; }
+  .q-card.answered-wrong { border-left-color: #e74c3c; }
+
+  .q-tag {
+    font-size: .75em;
+    color: #8a8a8a;
+    margin-bottom: 4px;
+  }
+  .q-text {
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .q-num {
+    display: inline-block;
+    background: #4b6cb7;
+    color: #fff;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    line-height: 26px;
+    font-size: .8em;
+    margin-right: 8px;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt-btn {
+    text-align: left;
+    padding: 10px 14px;
+    border: 2px solid #e3e6ee;
+    border-radius: 10px;
+    background: #fafbfd;
+    cursor: pointer;
+    font-size: .93em;
+    line-height: 1.4;
+    transition: .15s;
+  }
+  .opt-btn:hover:not(.locked) { background: #eef1fb; border-color: #b9c4e6; }
+  .opt-btn.correct { background: #e5f9ee; border-color: #2ecc71; color: #1b7a43; font-weight: 700; }
+  .opt-btn.wrong { background: #fdeaea; border-color: #e74c3c; color: #b32d2d; font-weight: 700; }
+  .opt-btn.locked { cursor: default; opacity: .85; }
+
+  .feedback {
+    margin-top: 10px;
+    font-size: .85em;
+    font-weight: 700;
+  }
+  .feedback.ok { color: #1b7a43; }
+  .feedback.no { color: #b32d2d; }
+
+  .note {
+    background: #fff8e6;
+    border: 1px solid #f0d896;
+    color: #7a5c00;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: .85em;
+    margin-bottom: 18px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+    font-size: .8em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ข้อสอบรายวิชา Virtual</h1>
+  <p>เลือกคำตอบแล้วระบบจะเฉลยทันที — สีเขียว = ถูกต้อง, สีแดง = คำตอบที่เลือกผิด</p>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="container" id="container"></div>
+
+<footer>สร้างจากไฟล์ข้อสอบที่อัปโหลด — โปรดตรวจทานเนื้อหาอีกครั้งก่อนใช้งานจริง</footer>
+
+<script>
+// ================== DATA ==================
+// type: 'tf' -> options = ["True","False"], correct = index
+// type: 'mc' -> options = [...], correct = index
+
+const quizData = {
+  ch2: {
+    label: "บทที่ 2",
+    title: "บทที่ 2 : Virtual Ontology",
+    questions: [
+      {type:'tf', text:"ประเด็นทางวิทยาของโลกเสมือนมีความสำคัญ เนื่องจากข้อมูลดิจิทัลไม่ได้มีอยู่เหมือนวัตถุทางกายภาพ ทำให้มีปัญหาเรื่องสถานภาพของวัตถุดิจิทัลว่ามีความจริงแท้อย่างไร ซึ่งปัญหานี้เกี่ยวเป็นประเด็นวิทยาศาสตร์สัจนิยม", correct:0},
+      {type:'tf', text:"สัจนิยมคือแนวคิดที่เชื่อว่าทุกสิ่งเป็นไปตามหลักธรรมและสัจธรรม เพราะว่าธรรมะเป็นความจริงที่ไม่เปลี่ยนแปลงและเป็นแก่นแท้ของชีวิตมนุษย์และสรรพสิ่ง", correct:1},
+      {type:'tf', text:"แบบจำลองคอมพิวเตอร์ในโลกเสมือนเป็นของปลอมทั้งหมด เพราะว่าเป็นการสร้างโดยมนุษย์ ความไม่ปลอดภัยของวัตถุดิจิทัลเป็นเพราะว่ามนุษย์สร้างขึ้นโดยไม่มีวัตถุทางกายภาพรองรับ และสภาวะดิจิทัลเป็นสภาวะเสมือนที่ไม่มีความเป็นธรรมชาติ", correct:1},
+      {type:'tf', text:"ประเด็นทางปรัชญาเกี่ยวกับความฝันกับ Simulation argument มีลักษณะเหมือนกัน คือชวนให้เราตั้งคำถามกับโลกที่เรารับรู้", correct:0},
+      {type:'tf', text:"Simulation Argument คือเหตุผลที่พูดถึงความเป็นไปได้ว่า ความเป็นจริงอาจไม่ตรงกับที่เรารับรู้ สิ่งที่เรารับรู้ว่าเป็นวัตถุ แท้จริงแล้วอาจจะเป็นแค่ข้อมูลที่ถูกสร้างขึ้นในแบบจำลอง (Simulation) ก็ได้", correct:0},
+      {type:'tf', text:"แม้ว่า VR ต้องใช้หลักฟิสิกส์เพื่อสร้างความสมจริงของวัตถุ แต่ความรู้ทางฟิสิกส์อย่างเดียวไม่เพียงพอที่จะพัฒนา VR จะต้องมีความรู้เกี่ยวกับโปรแกรมคอมพิวเตอร์ด้วย", correct:0},
+      {type:'tf', text:"การสร้างแบบจำลอง VR เพื่อใช้เป็นการฝึกประสบการณ์ไม่เหมือนกับการสร้างเกม เพราะจุดมุ่งหมายของการฝึกประสบการณ์ต้องอาศัยความสมจริง แต่การสร้างเกมมีจุดมุ่งหมายเพื่อความบันเทิง", correct:0},
+      {type:'tf', text:"สภาพแวดล้อมดิจิทัลมีเป้าหมายเพื่อแทนที่วัตถุทางกายภาพ", correct:1},
+    ]
+  },
+  ch3: {
+    label: "บทที่ 3",
+    title: "บทที่ 3 : Hyperhistory",
+    questions: [
+      {type:'mc', text:"ข้อใดต่อไปนี้เป็นจริง", options:[
+        "ตัวอักษรไม่นับเป็นเทคโนโลยี",
+        "การส่งข้อความทางนกพิราบนับเป็นเทคโนโลยีการสื่อสารแบบหนึ่ง",
+        "ยุคประวัติศาสตร์เริ่มต้นขึ้นเมื่อมีอินเตอร์เน็ต",
+        "เทคโนโลยีการพิมพ์ทำให้เกิดเส้นทางการค้าระหว่างประเทศ",
+        "มุขปาฐะตกยุคกว่าเทคโนโลยีช่วยจำ เพราะใช้สติปัญญาของมนุษย์"
+      ], correct:1},
+      {type:'mc', text:"ข้อใดต่อไปนี้เป็นเท็จ", options:[
+        "การพิมพ์ทำให้ความรู้แพร่กระจายไปได้เร็วขึ้น",
+        "การแพร่กระจายของข้อมูลดิจิทัลทำให้ประวัติศาสตร์กลายเป็นยุค Hyperhistory",
+        "การบันทึกทางประวัติศาสตร์ทำให้การเมืองมีความเป็นประชาธิปไตยมากขึ้น",
+        "ข้อมูลดิจิทัลและอะนาล็อกให้ความรู้ได้เหมือนกัน ต่างกันเพียงรูปแบบของเทคโนโลยีในการสื่อสาร",
+        "การเข้ารหัสมีความสำคัญในการสื่อสารเพื่อรักษาความปลอดภัยของข้อมูล"
+      ], correct:2},
+      {type:'mc', text:"ข้อใดต่อไปนี้เป็นจริง", options:[
+        "ทฤษฎีการสื่อสารแบบคณิตศาสตร์เป็นการสร้าง code เพื่อให้คอมพิวเตอร์อ่านข้อมูลได้",
+        "การรับ-ส่งข้อมูลในระบบดิจิทัลสิ้นเปลืองพลังงานน้อยกว่าระบบอะนาล็อก",
+        "เทคโนโลยีแบบดิจิทัลเกิดขึ้นได้เองโดยไม่ต้องพึ่งพาการพัฒนาชิปคอมพิวเตอร์",
+        "การส่งข้อมูลในระบบดิจิทัลไม่มีทางเกิดข้อผิดพลาด",
+        "การรับ-ส่งข้อมูลแบบอะนาล็อกมีปัญหาเรื่องสัญญาณรบกวน"
+      ], correct:4},
+      {type:'mc', text:"ข้อใดต่อไปนี้เป็นเท็จ", options:[
+        "การบันทึกข้อมูลในรูปแบบดิจิทัลทำให้ความจริงถูกบิดเบือน",
+        "เทคโนโลยีความเป็นจริงเสมือนไม่ได้มีวัตถุประสงค์เพื่อความบันเทิงเท่านั้น",
+        "เทคโนโลยีความเป็นจริงเสมือนคือการสร้างวัตถุในรูปแบบข้อมูลดิจิทัล",
+        "เทคโนโลยีความเป็นจริงเสมือนทำให้การสื่อสารทางไกลมีความสมจริงมากขึ้น",
+        "สารสนเทศดิจิทัลในโลกเสมือนให้ความรู้ได้"
+      ], correct:0},
+    ]
+  },
+  ch4: {
+    label: "บทที่ 4",
+    title: "บทที่ 4 : Digital Law",
+    questions: [
+      {type:'tf', text:"เจ้าของข้อมูล (Data Subject) มีสิทธิเสมอไปที่จะขอลบข้อมูลส่วนบุคคลของตนจากผู้ควบคุมข้อมูลส่วนบุคคล (Data Controller) แบบไม่มีเงื่อนไข", correct:0},
+      {type:'tf', text:"พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคลมีวัตถุประสงค์ เพื่อกำหนดมาตรการรักษาความปลอดภัยของข้อมูลส่วนบุคคล", correct:0},
+      {type:'tf', text:"พ.ร.บ.ว่าด้วยธุรกรรมทางอิเล็กทรอนิกส์มีวัตถุประสงค์เพื่อรับรองสถานะทางกฎหมายของการทำธุรกรรมทางอิเล็กทรอนิกส์ ให้มีผลผูกพันบังคับใช้ตามกฎหมาย", correct:0},
+      {type:'tf', text:"การนำภาพบัตรของบุคคลอื่นมาแอบอ้างว่าเป็นตนเองแล้วนำไปโพสต์ลง Instagram ส่วนบุคคล โดยไม่ขออนุญาต ถือว่ามีความผิด พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล", correct:1},
+      {type:'tf', text:"พ.ร.บ.ว่าด้วยธุรกรรมทางอิเล็กทรอนิกส์ ใช้เฉพาะธุรกรรมที่เกี่ยวกับภาครัฐเท่านั้น ไม่สามารถใช้กับภาคเอกชน", correct:1},
+      {type:'tf', text:"ข้อมูลชีวภาพ เช่น โครงสร้างใบหน้า ลายนิ้วมือ ม่านตา จัดเป็น Sensitive Data ซึ่งต้องได้รับอนุญาตจากเจ้าของข้อมูลก่อนการเก็บรวบรวม หรือประมวลผลข้อมูลนี้ก่อนเสมอ", correct:0},
+      {type:'tf', text:"การลงชื่อท้ายอีเมลนับเป็นการลงลายมือชื่ออิเล็กทรานิกส์", correct:0},
+      {type:'tf', text:"หลังตกลงกู้ยืมเงินทางแชทแล้ว คู่สัญญาต้องไปทำหนังสือสัญญาฉบับจริงด้วย สัญญาจึงจะมีผลผูกพันตามกฎหมาย", correct:1},
+    ]
+  },
+  ch5: {
+    label: "บทที่ 5",
+    title: "บทที่ 5 : Virtual Education",
+    questions: [
+      {type:'tf', text:"กระแส Digital transformation คือการพัฒนาเทคโนโลยีดิจิทัลเพื่อเป็นสื่อกลางในการบันทึก ประมวลผล และแสดงผลข้อมูลข่าวสาร จากความก้าวหน้าของเทคโนโลยีดังกล่าวทำให้เกิดความพยายามใช้ระบบเทคโนโลยีดิจิทัลกับการศึกษาไปด้วย", correct:0},
+      {type:'tf', text:"Postdigital คือปรากฏการณ์ที่เทคโนโลยีดิจิทัลเข้ามามีบทบาทกับกิจกรรมต่างๆ และบทบาทของเทคโนโลยีดิจิทัลเป็นส่วนสำคัญของกิจกรรมต่างๆ จนไม่สามารถแบ่งแยกระหว่างกิจกรรมดิจิทัลและกิจกรรมที่ไม่ใช้ดิจิทัลได้", correct:0},
+      {type:'tf', text:"Postdigital เป็นปรากฏการณ์ที่เกิดขึ้นเฉพาะในบริบทของการศึกษาเท่านั้น เพราะว่าระบบการศึกษาที่พึ่งพาระบบเทคโนโลยีดิจิทัลมากที่สุด เห็นได้จาก Platform ต่างๆ ทางการศึกษา คอร์สออนไลน์และสื่อการสอน", correct:1},
+      {type:'tf', text:"Andrew Feenberg เห็นด้วยกับการนำเทคโนโลยีดิจิทัลมาใช้ในระบบการศึกษา แต่ไม่เห็นด้วยกับการที่พึ่งพาเทคโนโลยีดิจิทัลอย่างขาดไม่ได้ และไม่เห็นด้วยกับการที่จะเรียกว่า Postdigital", correct:0},
+      {type:'tf', text:"ข้อเสนอสำคัญที่ Feenberg มีต่อเทคโนโลยีดิจิทัลคือ เทคโนโลยีไม่ควรลดทอนความสำคัญของมนุษย์ เมื่อมองจากการเรียนรู้และการศึกษาเป็นกิจกรรมของมนุษย์ การออกแบบเทคโนโลยีเพื่อลดบทบาทของมนุษย์ในระบบการศึกษาจึงถือว่าเป็นการออกแบบเทคโนโลยีที่ไม่เป็นธรรม", correct:0},
+      {type:'tf', text:"แนวคิดของ Feenberg ทำให้เห็นว่า ธรรมชาติของมนุษย์รักการเรียนรู้ และไม่ว่าเทคโนโลยีจะก้าวหน้าไปแค่ไหน แก่นแท้ของความเป็นมนุษย์คือการแสวงหาความรู้ไม่ว่าจะด้วยการใช้เทคโนโลยีหรือไม่ก็ตาม", correct:1},
+      {type:'tf', text:"Big Data เกี่ยวข้องกับ Postdigital เพราะระบบเทคโนโลยีดิจิทัลจะต้องอาศัยการจัดการข้อมูลจำนวนมาก และเป้าหมายที่แท้จริงของ Big Data ก็เพื่อให้ผู้เรียนทุกคนสามารถเข้าถึงความรู้ได้อย่างเท่าเทียม", correct:1},
+      {type:'mc', text:"ข้อใดเป็นจริงเกี่ยวกับการศึกษายุคดิจิทัล", options:[
+        "ความเปลี่ยนแปลงทางเทคโนโลยีไม่ได้ส่งผลกับวิธีการหาความรู้",
+        "เทคโนโลยีดิจิทัลทำให้การศึกษามีความเป็นประชาธิปไตยมากขึ้น",
+        "เทคโนโลยีดิจิทัลจะเข้ามาแทนที่ชั้นเรียนทางกายภาพในอนาคต",
+        "ยุคดิจิทัลทำให้ผู้เรียนต้องพัฒนาทักษะในการแยกแยะข้อมูลและทักษะในการหาความรู้มากขึ้น",
+        "เทคโนโลยีดิจิทัลในการศึกษามีข้อเสียมากกว่าข้อดี แต่ระบบดิจิทัลที่เกิดขึ้นเป็นผลมาจากบริษัทเอกชนต้องการทำกำไร จึงไม่อาจปฏิเสธว่าการศึกษาดิจิทัลเป็นสิ่งที่ดี"
+      ], correct:3},
+    ]
+  },
+  ch6: {
+    label: "บทที่ 6",
+    title: "บทที่ 6 : Game (Online self)",
+    questions: [
+      {type:'tf', text:"ประโยชน์ของการสร้างเกมคือได้เพื่อความบันเทิงเท่านั้น", correct:1},
+      {type:'tf', text:"เกมสามารถถูกออกแบบให้อยู่ในรูปแบบของเทคโนโลยีดิจิทัลเท่านั้น", correct:1},
+      {type:'tf', text:"เกมสามารถเป็นศิลปะรูปแบบหนึ่งได้", correct:0},
+      {type:'tf', text:"การกำหนดจำนวนตัวเลขของการสื่อสารผ่านสังคมออนไลน์ทำให้ผู้ใช้มีการแข่งขันหรือสร้างโพส เพื่อให้เกิดการมองเห็นมากขึ้น", correct:0},
+      {type:'tf', text:"กฎเกณฑ์ของเกมสามารถให้มุมมองเกี่ยวกับการกระทำและการตัดสินใจ", correct:0},
+      {type:'tf', text:"รายได้ของอุตสาหกรรมเกมส่วนใหญ่เกิดขึ้นจากราคาคอมพิวเตอร์ที่แพงขึ้น", correct:1},
+      {type:'tf', text:"เกมเป็นสื่อบันเทิงที่ใช้เวลาอย่างต่อเนื่องและมีชุมชนของผู้เล่นที่ทำให้กลับมาอยู่รวมกันในเกม", correct:0},
+      {type:'tf', text:"การแข่งขันเกม eSport เกิดจากธุรกิจเกมมองเห็นโอกาสทางธุรกิจในการจัดการแข่งขัน", correct:1},
+    ]
+  },
+};
+
+// build "all" (รวมข้อสอบบทที่ 1-6) from available chapters
+const allQuestions = [];
+["ch2","ch3","ch4","ch5","ch6"].forEach(key=>{
+  quizData[key].questions.forEach(q=>{
+    allQuestions.push(Object.assign({}, q, {chLabel: quizData[key].label}));
+  });
+});
+quizData.all = {
+  label: "รวมข้อสอบ",
+  title: "รวมข้อสอบบทที่ 1-6",
+  note: "หมายเหตุ: ในไฟล์ต้นฉบับที่ได้รับมามีข้อสอบของบทที่ 2-6 เท่านั้น (ไม่พบข้อสอบของบทที่ 1) หน้านี้จึงรวมข้อสอบจากบทที่ 2-6 ทั้งหมดไว้ด้วยกัน",
+  questions: allQuestions
+};
+
+const tabOrder = [
+  {key:'ch2', label:'บทที่ 2 Virtual Ontology'},
+  {key:'ch3', label:'บทที่ 3 Hyperhistory'},
+  {key:'ch4', label:'บทที่ 4 Digital Law'},
+  {key:'ch5', label:'บทที่ 5 Virtual Education'},
+  {key:'ch6', label:'บทที่ 6 Game'},
+  {key:'all', label:'รวมข้อสอบบทที่ 1-6'},
+];
+
+// ================== RENDER ==================
+const tabsEl = document.getElementById('tabs');
+const containerEl = document.getElementById('container');
+
+tabOrder.forEach((t, i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (i===0 ? ' active' : '');
+  btn.textContent = t.label;
+  btn.dataset.key = t.key;
+  btn.onclick = ()=> switchTab(t.key);
+  tabsEl.appendChild(btn);
+
+  const section = document.createElement('div');
+  section.className = 'section' + (i===0 ? ' active' : '');
+  section.id = 'sec-' + t.key;
+  containerEl.appendChild(section);
+
+  renderSection(t.key);
+});
+
+function switchTab(key){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active', s.id==='sec-'+key));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderSection(key){
+  const data = quizData[key];
+  const section = document.getElementById('sec-'+key);
+  section.innerHTML = '';
+
+  const h = document.createElement('div');
+  h.className = 'section-title';
+  h.textContent = data.title;
+  section.appendChild(h);
+
+  if(data.note){
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = data.note;
+    section.appendChild(note);
+  }
+
+  const scoreBar = document.createElement('div');
+  scoreBar.className = 'score-bar';
+  scoreBar.innerHTML = '<span>คะแนน: <span class="score-num" id="score-'+key+'">0</span> / '+data.questions.length+'</span>';
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'reset-btn';
+  resetBtn.textContent = 'ทำใหม่';
+  resetBtn.onclick = ()=> renderSection(key);
+  scoreBar.appendChild(resetBtn);
+  section.appendChild(scoreBar);
+
+  let score = 0;
+
+  data.questions.forEach((q, idx)=>{
+    const card = document.createElement('div');
+    card.className = 'q-card';
+
+    const tag = document.createElement('div');
+    tag.className = 'q-tag';
+    tag.textContent = q.chLabel ? q.chLabel : '';
+    if(q.chLabel) card.appendChild(tag);
+
+    const qText = document.createElement('div');
+    qText.className = 'q-text';
+    qText.innerHTML = '<span class="q-num">'+(idx+1)+'</span>' + q.text;
+    card.appendChild(qText);
+
+    const optsWrap = document.createElement('div');
+    optsWrap.className = 'options';
+
+    const options = q.type === 'tf' ? ['True','False'] : q.options;
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+
+    options.forEach((optText, optIdx)=>{
+      const optBtn = document.createElement('button');
+      optBtn.className = 'opt-btn';
+      optBtn.textContent = (q.type==='mc' ? (optIdx+1)+'. ' : '') + optText;
+      optBtn.onclick = ()=>{
+        if(optBtn.classList.contains('locked')) return;
+        const allBtns = optsWrap.querySelectorAll('.opt-btn');
+        allBtns.forEach(b=>b.classList.add('locked'));
+
+        if(optIdx === q.correct){
+          optBtn.classList.add('correct');
+          card.classList.add('answered-correct');
+          feedback.textContent = 'ถูกต้อง!';
+          feedback.className = 'feedback ok';
+          score++;
+        } else {
+          optBtn.classList.add('wrong');
+          allBtns[q.correct].classList.add('correct');
+          card.classList.add('answered-wrong');
+          feedback.textContent = 'ไม่ถูกต้อง — คำตอบที่ถูกต้องคือข้อที่ทำเครื่องหมายสีเขียว';
+          feedback.className = 'feedback no';
+        }
+        document.getElementById('score-'+key).textContent = score;
+      };
+      optsWrap.appendChild(optBtn);
+    });
+
+    card.appendChild(optsWrap);
+    card.appendChild(feedback);
+    section.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
