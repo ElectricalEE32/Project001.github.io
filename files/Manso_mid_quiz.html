@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Man-Society Quiz</title>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:"Tahoma","Segoe UI",sans-serif;
+    background-color:#f4f7fb;
+    background-image:
+      linear-gradient(#dfe5ec 1px,transparent 1px),
+      linear-gradient(90deg,#dfe5ec 1px,transparent 1px);
+    background-size:25px 25px;
+    color:#172033;
+  }
+  header{
+    background:linear-gradient(135deg,#173b67,#285b8f);
+    color:white;
+    padding:24px 18px 20px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,.18);
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  header h1{margin:0 0 7px;font-size:28px}
+  header p{margin:0;opacity:.9}
+  .tabs{
+    position:sticky;
+    top:93px;
+    z-index:19;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    padding:12px;
+    background:rgba(255,255,255,.96);
+    border-bottom:1px solid #d8dee8;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+  }
+  .tab{
+    border:0;
+    border-radius:10px;
+    padding:11px 15px;
+    background:#e7edf5;
+    color:#20344e;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .tab:hover{transform:translateY(-1px);background:#dbe6f3}
+  .tab.active{background:#1f5f99;color:#fff}
+  .toolbar{
+    max-width:1050px;
+    margin:18px auto 0;
+    padding:0 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .score{
+    background:#fff;
+    border:1px solid #dbe2eb;
+    border-radius:12px;
+    padding:10px 14px;
+    box-shadow:0 3px 12px rgba(0,0,0,.06);
+    font-weight:700;
+  }
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .action{
+    border:0;
+    border-radius:9px;
+    padding:9px 13px;
+    cursor:pointer;
+    font-weight:700;
+    background:#253d5b;
+    color:#fff;
+  }
+  .action.secondary{background:#7b8798}
+  .quiz-section{
+    display:none;
+    max-width:1050px;
+    margin:0 auto;
+    padding:15px 14px 50px;
+  }
+  .quiz-section.active{display:block}
+  .section-title{
+    background:#fff;
+    border-left:6px solid #1f5f99;
+    border-radius:12px;
+    padding:18px 20px;
+    margin:4px 0 18px;
+    box-shadow:0 3px 12px rgba(0,0,0,.07);
+  }
+  .section-title h2{margin:0 0 5px}
+  .section-title p{margin:0;color:#64748b}
+  .question{
+    background:#fff;
+    border:1px solid #dce3ec;
+    border-radius:14px;
+    margin:0 0 16px;
+    padding:20px;
+    box-shadow:0 4px 14px rgba(0,0,0,.07);
+  }
+  .q-head{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:15px;
+  }
+  .q-number{
+    min-width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    background:#edf4fb;
+    color:#1f5f99;
+    font-weight:800;
+  }
+  .q-text{
+    font-size:17px;
+    line-height:1.65;
+    font-weight:700;
+    flex:1;
+  }
+  .options{display:grid;gap:9px}
+  .option{
+    position:relative;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    border:2px solid #e1e7ef;
+    border-radius:10px;
+    padding:12px 14px;
+    cursor:pointer;
+    background:#fafbfd;
+    transition:.15s;
+    line-height:1.5;
+  }
+  .option:hover{border-color:#9fb8d2;background:#f5f9fd}
+  .option input{margin-top:4px;accent-color:#1f5f99}
+  .option.correct{
+    background:#dcfce7;
+    border-color:#22c55e;
+    color:#166534;
+  }
+  .option.wrong{
+    background:#fee2e2;
+    border-color:#ef4444;
+    color:#991b1b;
+  }
+  .feedback{
+    display:none;
+    margin-top:12px;
+    padding:10px 13px;
+    border-radius:9px;
+    font-weight:700;
+  }
+  .feedback.show{display:block}
+  .feedback.ok{background:#ecfdf5;color:#166534}
+  .feedback.bad{background:#fff1f2;color:#991b1b}
+  .footer{
+    text-align:center;
+    color:#64748b;
+    padding:20px;
+  }
+  @media(max-width:700px){
+    header h1{font-size:22px}
+    .tabs{top:83px}
+    .tab{flex:1 1 45%;font-size:12px}
+    .q-text{font-size:15px}
+    .question{padding:15px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Man-Society Quiz</h1>
+  <p>แบบฝึกทำข้อสอบ Week 02–06 และรวมควิซกลางภาค</p>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-target="week2">Week02-Agricultural</button>
+  <button class="tab" data-target="week3">Week03-Tragedy</button>
+  <button class="tab" data-target="week4">Week04-Socially_constrac</button>
+  <button class="tab" data-target="week5">Week05-Sustainable</button>
+  <button class="tab" data-target="week6">Week06-มนุษย์กับเมือง</button>
+  <button class="tab" data-target="midterm">รวมควิซกลางภาค</button>
+</nav>
+
+<div class="toolbar">
+  <div class="score" id="scoreBox">ตอบแล้ว 0 / 20 | ถูก 0 ข้อ</div>
+  <div class="actions">
+    <button class="action" onclick="scrollTopPage()">↑ กลับขึ้นด้านบน</button>
+    <button class="action secondary" onclick="resetCurrent()">รีเซ็ตแท็บนี้</button>
+    <button class="action secondary" onclick="resetAll()">รีเซ็ตทั้งหมด</button>
+  </div>
+</div>
+
+<main>
+
+<section class="quiz-section active" id="week2">
+  <div class="section-title">
+    <h2>Week02-Agricultural</h2>
+    <p>20 ข้อ — ตอบคำถามแล้วระบบจะแสดงผลทันที</p>
+  </div>
+  <div id="week2-questions"></div>
+</section>
+
+<section class="quiz-section" id="week3">
+  <div class="section-title">
+    <h2>Week03-Tragedy</h2>
+    <p>10 ข้อ — Tragedy of the Commons</p>
+  </div>
+  <div id="week3-questions"></div>
+</section>
+
+<section class="quiz-section" id="week4">
+  <div class="section-title">
+    <h2>Week04-Socially_constrac</h2>
+    <p>10 ข้อ</p>
+  </div>
+  <div id="week4-questions"></div>
+</section>
+
+<section class="quiz-section" id="week5">
+  <div class="section-title">
+    <h2>Week05-Sustainable</h2>
+    <p>5 ข้อ</p>
+  </div>
+  <div id="week5-questions"></div>
+</section>
+
+<section class="quiz-section" id="week6">
+  <div class="section-title">
+    <h2>Week06-มนุษย์กับเมือง</h2>
+    <p>8 ข้อ</p>
+  </div>
+  <div id="week6-questions"></div>
+</section>
+
+<section class="quiz-section" id="midterm">
+  <div class="section-title">
+    <h2>รวมควิซกลางภาค</h2>
+    <p>รวมข้อสอบ Week 02–06 ทั้งหมด 53 ข้อในหน้าเดียว</p>
+  </div>
+  <div id="midterm-questions"></div>
+</section>
+
+</main>
+
+<div class="footer">Man-Society Quiz • HTML ไฟล์เดียว เปิดได้โดยไม่ต้องติดตั้งโปรแกรมเพิ่ม</div>
+
+<script>
+const quizData = {
+  week2: {
+    title:"Week02-Agricultural",
+    questions:[
+      ["ตามความเชื่อแบบวิญญาณนิยม (Animism) มีเพียงมนุษย์เท่านั้นที่เชื่อว่ามีจิตวิญญาณ ส่วนสัตว์ พืช และสิ่งต่าง ๆ ในธรรมชาติไม่มีจิตวิญญาณหรือความรู้สึก","F"],
+      ["ความสำเร็จของข้าวสาลีในการแพร่กระจายไปทั่วโลกเกิดขึ้นได้ส่วนหนึ่งเพราะมนุษย์ทุ่มเทแรงงานดูแล ปกป้อง และสร้างสภาพแวดล้อมที่เหมาะสมให้ข้าวสาลีเจริญเติบโต","T"],
+      ["การเลี้ยงสัตว์หลังการปฏิวัติเกษตรกรรมช่วยลดการเกิดโรคติดต่อจากสัตว์สู่คน เนื่องจากมนุษย์สามารถควบคุมสัตว์ได้ดีขึ้น","F"],
+      ["ในสังคมของชิมแปนซี ตัวผู้จ่าฝูงไม่ได้เป็นผู้นำเพราะความแข็งแรงเพียงอย่างเดียว แต่ต้องอาศัยการสร้างพันธมิตรและความไว้วางใจจากสมาชิกในฝูงด้วย","T"],
+      ["ชาวนายุคแรกมีแนวโน้มใช้ความรุนแรงน้อยกว่ามนุษย์ที่ดำรงชีวิตแบบล่าสัตว์และเก็บของป่า","F"],
+      ["การปฏิวัติเกษตรกรรมเกิดขึ้นพร้อมกันในทุกภูมิภาคของโลก รวมทั้งออสเตรเลีย อลาสกา และแอฟริกาใต้","F"],
+      ["การละทิ้งวิถีชีวิตเร่ร่อนและหันมาทำเกษตรกรรมทำให้อัตราการเสียชีวิตของเด็กลดลง เนื่องจากมีอาหารเพียงพอและสุขอนามัยที่ดีขึ้น","F"],
+      ["หลักฐานจากหลุมศพเด็กที่ขุงเกียร์บ่งชี้ว่า เมื่อประมาณ 30,000 ปีก่อน มนุษย์สามารถสร้างความเชื่อและกฎเกณฑ์ทางสังคมที่ซับซ้อน ซึ่งไม่ได้ถูกกำหนดโดยชีววิทยาเพียงอย่างเดียว","T"],
+      ["ตามแนวคิดของ Harari ความสามารถในการสื่อสารเกี่ยวกับสิ่งที่ไม่มีอยู่จริง เช่น ความเชื่อหรือเรื่องเล่า และการร่วมมือกับคนจำนวนมาก เป็นปัจจัยสำคัญที่ทำให้ Homo sapiens กลายเป็นมนุษย์สายพันธุ์ที่ครองโลก","T"],
+      ["ตามเนื้อหา Harari เสนอว่าสัตว์เลี้ยงทุกชนิดในสังคมเกษตรกรรมมีชีวิตที่ทุกข์ทรมานเหมือนกันทั้งหมด","F"],
+      ["มนุษย์นีแอนเดอร์ทัลมีรูปร่างใหญ่และมีกล้ามเนื้อแข็งแรง ซึ่งเป็นลักษณะที่ช่วยให้ปรับตัวเข้ากับสภาพอากาศหนาวเย็นของยุโรปและเอเชียตะวันตกในยุคน้ำแข็งได้","T"],
+      ["การตั้งถิ่นฐานถาวรหลังการปฏิวัติเกษตรกรรมทำให้มนุษย์มีอาณาเขตกว้างขวางขึ้นกว่าสมัยที่เป็นนักล่าสัตว์-เก็บของป่า","F"],
+      ["ตามแนวคิดของ Harari การปฏิวัติเกษตรกรมมทำให้มนุษย์ส่วนใหญ่มีคุณภาพชีวิตที่ดีขึ้น ทำงานน้อยลง และมีเวลาว่างมากขึ้น","F"],
+      ["การควบคุมและใช้ไฟช่วยให้มนุษย์ยุคแรกสามารถปรุงอาหาร กำจัดเชื้อโรคและปรสิตในอาหาร และรับประทานอาหารได้หลากหลายขึ้น","T"],
+      ["ตามแนวคิดของ Harari เมื่อมนุษย์เลือกทำเกษตรกรรมแล้ว การเพิ่มขึ้นของประชากรและการเปลี่ยนแปลงของพื้นที่ทำให้การกลับไปใช้ชีวิตแบบล่าสัตว์และเก็บของป่าแทบไม่ใช่ทางเลือกอีกต่อไป","T"],
+      ["ในฟาร์มโคนมสมัยใหม่ ลูกวัวส่วนใหญ่จะอยู่กับแม่จนโตเต็มวัยเพื่อช่วยกระตุ้นการผลิตน้ำนม","F"],
+      ["หากใช้จำนวนประชากรและความสามารถในการสืบเผ่าพันธุ์เป็นเกณฑ์วัดความสำเร็จของมนุษย์ การปฏิวัติเกษตรกรรมถือเป็นการก้าวกระโดดครั้งใหญ่ของมนุษยชาติ","T"],
+      ["หากใช้ความอยู่รอดและการสืบพันธุ์เป็นเกณฑ์วัดความสำเร็จของสปีชีส์ สัตว์เลี้ยงอย่างไก่ วัว ควาย หมู และแกะถือว่าประสบความสำเร็จ แม้ว่าสัตว์จำนวนมากจะมีอายุขัยสั้นลงจากการถูกเลี้ยงเพื่อการผลิต","T"],
+      ["มนุษย์ยุคแรกดำรงชีวิตโดยล่าสัตว์ขนาดใหญ่เป็นหลัก และแทบไม่กินพืช แมลง หรือซากสัตว์","F"],
+      ["การเดินด้วยสองขาทำให้การคลอดบุตรของมนุษย์ง่ายขึ้น เพราะกระดูกเชิงกรานมีช่องทางคลอดที่กว้างและตรงมากขึ้น","F"]
+    ]
+  },
+
+  week3: {
+    title:"Week03-Tragedy",
+    questions:[
+      ["หลักอำนาจอธิปไตยของรัฐหมายความว่าการตัดสินใจของประเทศหนึ่งจะไม่ส่งผลกระทบต่อประเทศอื่น","F"],
+      ["Hardin เห็นว่ารัฐสวัสดิการอาจลดข้อจำกัดตามธรรมชาติที่เคยควบคุมการเพิ่มของประชากร","T"],
+      ["Homo Economicus คือ แนวคิดที่มองว่ามนุษย์เป็นผู้มีเหตุผลทางเศรษฐกิจ โดยจะพิจารณาเปรียบเทียบผลประโยชน์และต้นทุนหรือผลเสียก่อนตัดสินใจเลือกการกระทำที่ก่อให้เกิดประโยชน์สูงสุดแก่ตนเอง","T"],
+      ["ข้อจำกัดของการใช้กรรมสิทธิ์ส่วนบุคคลในการแก้ปัญหาสิ่งแวดล้อม คือทรัพยากรบางประเภท เช่น อากาศและแหล่งน้ำ ไม่สามารถกำหนดความเป็นเจ้าของได้อย่างชัดเจน","T"],
+      ["หากทรัพยากรเป็นของส่วนรวม ปัญหา Tragedy of the Commons จะไม่เกิดขึ้น","F"],
+      ["แนวคิด Tragedy of the Commons เกิดขึ้นเฉพาะเมื่อมีการใช้ทรัพยากรส่วนรวมมากเกินไปเท่านั้น","F"],
+      ["ผู้ก่อมลพิษมักเลือกบำบัดของเสียก่อนปล่อย เพราะมีต้นทุนต่ำกว่าการปล่อยของเสียลงสู่สิ่งแวดล้อมโดยตรง","F"],
+      ["การแก้ปัญหาสิ่งแวดล้อมเกี่ยวข้องกับทั้งผลประโยชน์ส่วนบุคคล กฎหมาย จริยธรรม การใช้อำนาจของรัฐ และความร่วมมือของทุกภาคส่วน","T"],
+      ["แนวคิดสำคัญของ Tragedy of the Commons (TOC) คือ เมื่อจำนวนประชากรเพิ่มขึ้น การใช้ทรัพยากรก็มีแนวโน้มเพิ่มขึ้น ส่งผลให้ทรัพยากรเสื่อมโทรม","T"],
+      ["ละอองลอยทุติยภูมิ (SOA) คือฝุ่นที่ถูกปล่อยออกมาจากปล่องควันหรือกองไฟโดยตรง","F"]
+    ]
+  },
+
+  week4: {
+    title:"Week04-Socially_constrac",
+    questions:[
+      ["ชาวเนเนตส์ดำรงชีวิตแบบเร่ร่อนเพราะยังไม่มีเทคโนโลยีเพียงพอที่จะสร้างบ้านถาวรในไซบีเรีย","F"],
+      ["เนื่องจากเดปอถู่และการบวชต้นไม้ไม่ได้มีกฎหมายรองรับ จึงไม่สามารถเป็นกลไกที่มีประสิทธิภาพในการอนุรักษ์ป่าได้","F"],
+      ["ระบบไร่หมุนเวียนของชาวกะเหรี่ยงเป็นการใช้พื้นที่อย่างไม่มีประสิทธิภาพ เพราะปล่อยให้พื้นที่ว่างหลายปีโดยไม่ได้ใช้ประโยชน์","F"],
+      ["คุณค่าของที่ดินเป็นคุณสมบัติทางกายภาพที่เหมือนกันสำหรับทุกสังคม จึงไม่มีความแตกต่างระหว่างมุมมองของชาวกะเหรี่ยงกับคนเมือง","F"],
+      ["พิธีบวชต้นไม้แสดงให้เห็นว่าการเปลี่ยนความหมายที่ผู้คนมีต่อธรรมชาติสามารถนำไปสู่การเปลี่ยนแปลงพฤติกรรมของผู้คนได้ แม้ว่าธรรมชาตินั้นจะไม่ได้เปลี่ยนแปลงทางกายภาพก็ตาม","T"],
+      ["การเกิดขึ้นของพระนักอนุรักษ์สะท้อนว่าบทบาทของศาสนาในสังคมลดลงจนไม่สามารถตอบสนองต่อปัญหาสังคมร่วมสมัยได้อีกต่อไป","F"],
+      ["เนื่องจากป่าต้นน้ำ ป่าศักดิ์สิทธิ์ และป่าใช้สอยล้วนเป็นป่าชนิดเดียวกันในทางกายภาพ จึงควรใช้กฎการจัดการเดียวกันเพื่อให้เกิดประสิทธิภาพสูงสุด","F"],
+      ["เนื่องจากความเชื่อและคุณค่าทางสังคมเป็นสิ่งที่มนุษย์สร้างขึ้น (socially constructed) จึงไม่มีผลต่อพฤติกรรมของมนุษย์ในโลกความเป็นจริง","F"],
+      ["หากชาวเนเนตส์หยุดการอพยพตามฤดูกาลและตั้งถิ่นฐานถาวร อาจส่งผลกระทบทั้งต่อวิถีชีวิตของชุมชนและความยั่งยืนของระบบนิเวศในพื้นที่","T"],
+      ["กรณีของ Seijin no Hi แสดงให้เห็นว่า ความเป็นผู้ใหญ่ไม่ได้ถูกกำหนดโดยอายุหรือชีววิทยาเพียงอย่างเดียว แต่ยังขึ้นอยู่กับความหมายและการยอมรับที่สังคมสร้างขึ้นผ่านพิธีกรรม","T"]
+    ]
+  },
+
+  week5: {
+    title:"Week05-Sustainable",
+    questions:[
+      ["จากการบรรยายในห้องเรียน การใช้หลอดจากพืชหรือหลอดโพลีแลกติกแอซิด (PLA) มักช่วยลดการปล่อยก๊าซเรือนกระจกได้มากกว่าหลอดพลาสติกทั่วไป","F"],
+      ["ความคืบหน้าในการดำเนินงานเพื่อบรรลุเป้าหมายการพัฒนาที่ยั่งยืนภายในปี ค.ศ. 2030 ในปัจจุบันยังไม่เป็นไปตามที่ตั้งเป้าไว้","T"],
+      ["งานวิจัยเผยว่ามีระดับไมโครพลาสติกและนาโนพลาสติกในสมองมนุษย์มากที่สุดเมื่อเทียบกับอวัยวะในส่วนอื่นของร่างกาย","T"],
+      ["รถยนต์ไฟฟ้าเป็นมิตรต่อสิ่งแวดล้อมในขั้นตอนการผลิตมากกว่ารถยนต์สันดาป","F"],
+      ["ในช่วงการดำรงตำแหน่งของไบเดน ผู้สนับสนุนส่วนมากของพรรครีพับลิกันหรือพรรคฝ่ายขวาของสหรัฐอเมริกามักสนับสนุนพลังงานหมุนเวียนมากกว่าพลังงานฟอสซิล","F"]
+    ]
+  },
+
+  week6: {
+    title:"Week06-มนุษย์กับเมือง",
+    questions:[
+      ["การเพิ่มพื้นที่สีเขียวให้กับเมืองส่งผลต่อกลุ่มผู้มีรายได้น้อยมากกว่ากลุ่มผู้มีรายได้สูง เนื่องจากความเสี่ยงในการเสียชีวิตของกลุ่มผู้มีรายได้น้อยลดลงอย่างชัดเจนเมื่อพื้นที่สีเขียวเพิ่มขึ้น","T"],
+      ["การสร้างพื้นที่สาธารณะ เช่น พื้นที่สีเขียวและสวนสาธารณะ มีผลเพียงต่อความสวยงามของเมือง แต่แทบไม่มีอิทธิพลต่อความสัมพันธ์ทางสังคมหรือพฤติกรรมการใช้ชีวิตของประชาชน","F"],
+      ["ผลของพื้นที่สีเขียวต่อการลดค่าอัตราความเสี่ยงในการเสียชีวิต (IRR) ปรากฏเด่นชัดที่สุดในโรคระบบทางเดินหายใจ เช่น โรคหอบหืดและโรคปอด มากกว่าโรคระบบไหลเวียนโลหิต","F"],
+      ["แนวคิด “American Dream” หลังสงครามโลกครั้งที่ 2 ส่งเสริมภาพชีวิตที่ประสบความสำเร็จผ่านการมีบ้านเดี่ยวพร้อมสนามหญ้า การใช้รถยนต์ส่วนบุคคล และการอยู่อาศัยในชานเมือง","T"],
+      ["ความสำเร็จของการวางผังเมืองในโตเกียวเกิดจากการแยกพื้นที่อยู่อาศัย ร้านค้า และสำนักงานออกจากกันอย่างเข้มงวด ทำให้ประชาชนต้องพึ่งพารถยนต์ส่วนบุคคลในการเดินทาง","F"],
+      ["เมืองที่น่าอยู่ (Livable City) ไม่ได้หมายถึงเพียงการมีพื้นที่สีเขียวเท่านั้น แต่ยังรวมถึงการออกแบบให้ผู้คนเข้าถึงบริการต่าง ๆ ได้สะดวก ส่งเสริมการเดิน การใช้ขนส่งสาธารณะ และมีพื้นที่สาธารณะสำหรับการพบปะทำกิจกรรมร่วมกัน","T"],
+      ["งานวิจัยชี้ว่าภาวะโรคอ้วนเป็นผลจากพฤติกรรมส่วนบุคคลเป็นหลัก ดังนั้นการออกแบบเมืองและระยะเวลาที่ต้องนั่งรถยนต์จึงแทบไม่มีผลต่อความเสี่ยงของการเกิดโรคอ้วน","F"],
+      ["ในแนวคิด Shared Space เมื่อมีการลดสิ่งควบคุมบนถนนลง ผู้ใช้ถนนจะอาศัยการสบตาและสื่อสารกันมากขึ้น เพื่อเพิ่มความระมัดระวังและใช้พื้นที่ร่วมกันอย่างปลอดภัย","T"]
+    ]
+  }
+};
+
+const sectionOrder = ["week2","week3","week4","week5","week6"];
+
+function makeQuestion(q, index, prefix){
+  const [text, answer] = q;
+  const id = prefix + "-" + index;
+  return `
+    <article class="question" data-id="${id}" data-answer="${answer}">
+      <div class="q-head">
+        <div class="q-number">${index}</div>
+        <div class="q-text">${escapeHtml(text)}</div>
+      </div>
+      <div class="options">
+        <label class="option" data-value="T">
+          <input type="radio" name="${id}" value="T" onchange="answerQuestion(this)">
+          <span>True</span>
+        </label>
+        <label class="option" data-value="F">
+          <input type="radio" name="${id}" value="F" onchange="answerQuestion(this)">
+          <span>False</span>
+        </label>
+      </div>
+      <div class="feedback"></div>
+    </article>
+  `;
+}
+
+function escapeHtml(str){
+  return str
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function renderSections(){
+  sectionOrder.forEach(key=>{
+    const box = document.getElementById(key+"-questions");
+    box.innerHTML = quizData[key].questions.map((q,i)=>makeQuestion(q,i+1,key)).join("");
+  });
+
+  const all = sectionOrder.flatMap(key => quizData[key].questions);
+  document.getElementById("midterm-questions").innerHTML =
+    all.map((q,i)=>makeQuestion(q,i+1,"midterm")).join("");
+}
+
+function answerQuestion(input){
+  const card = input.closest(".question");
+  const answer = card.dataset.answer;
+  const selected = input.value;
+  const options = card.querySelectorAll(".option");
+  const feedback = card.querySelector(".feedback");
+
+  options.forEach(o=>o.classList.remove("correct","wrong"));
+
+  if(selected === answer){
+    input.closest(".option").classList.add("correct");
+    feedback.className = "feedback show ok";
+    feedback.textContent = "✓ ตอบถูก";
+  }else{
+    input.closest(".option").classList.add("wrong");
+    card.querySelector('.option[data-value="'+answer+'"]').classList.add("correct");
+    feedback.className = "feedback show bad";
+    feedback.textContent = "✗ ตอบผิด — คำตอบที่ถูกคือ " + (answer==="T" ? "True" : "False");
+  }
+  updateScore();
+}
+
+function getCurrentKey(){
+  return document.querySelector(".quiz-section.active").id;
+}
+
+function getQuestionCards(key){
+  return [...document.querySelectorAll("#"+key+" .question")];
+}
+
+function updateScore(){
+  const key = getCurrentKey();
+  let cards = getQuestionCards(key);
+
+  let answered=0, correct=0;
+  cards.forEach(card=>{
+    const checked = card.querySelector("input:checked");
+    if(checked){
+      answered++;
+      if(checked.value === card.dataset.answer) correct++;
+    }
+  });
+
+  document.getElementById("scoreBox").textContent =
+    `ตอบแล้ว ${answered} / ${cards.length} | ถูก ${correct} ข้อ`;
+}
+
+function switchTab(key){
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.classList.toggle("active",t.dataset.target===key);
+  });
+  document.querySelectorAll(".quiz-section").forEach(s=>{
+    s.classList.toggle("active",s.id===key);
+  });
+  updateScore();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click",()=>switchTab(tab.dataset.target));
+});
+
+function resetCurrent(){
+  const key = getCurrentKey();
+  document.querySelectorAll("#"+key+" .question").forEach(card=>{
+    card.querySelectorAll("input").forEach(i=>i.checked=false);
+    card.querySelectorAll(".option").forEach(o=>o.classList.remove("correct","wrong"));
+    const fb=card.querySelector(".feedback");
+    fb.className="feedback";
+    fb.textContent="";
+  });
+  updateScore();
+}
+
+function resetAll(){
+  document.querySelectorAll(".question").forEach(card=>{
+    card.querySelectorAll("input").forEach(i=>i.checked=false);
+    card.querySelectorAll(".option").forEach(o=>o.classList.remove("correct","wrong"));
+    const fb=card.querySelector(".feedback");
+    fb.className="feedback";
+    fb.textContent="";
+  });
+  updateScore();
+}
+
+function scrollTopPage(){
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+renderSections();
+updateScore();
+</script>
+
+</body>
+</html>
